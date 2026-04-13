@@ -20,43 +20,51 @@ from jinja2 import Environment, FileSystemLoader
 ISRAEL_TZ = pytz.timezone('Asia/Jerusalem')
 
 
-def get_scan_version(task_id, conn_str):
-    """Query DB to determine scan version number based on how many scans
+def get_scan_version(task_id, db_path):
+    """Query SQLite to determine scan version number based on how many scans
     have been performed on the same SystemID."""
-    if not conn_str or not task_id:
-        return '1.0'
+    if not db_path or not task_id or str(task_id) in ("", "N/A"):
+        return "1.0"
     try:
-        import pyodbc
-        conn = pyodbc.connect(conn_str, timeout=10)
+        import sqlite3
+
+        conn = sqlite3.connect(db_path, timeout=10)
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT COUNT(*) FROM CodeReviews WHERE SystemID = (
                 SELECT SystemID FROM CodeReviews WHERE TaskID = ?
             )
-        """, int(task_id))
+        """,
+            (int(task_id),),
+        )
         row = cursor.fetchone()
         cursor.close()
         conn.close()
         if row:
-            return f'{row[0]}.0'
+            return f"{row[0]}.0"
     except Exception as e:
         print(f"WARNING: Could not determine scan version from DB: {e}")
-    return '1.0'
+    return "1.0"
 
 
-def get_system_name(task_id, conn_str):
-    """Query DB to get the system name for the report header."""
-    if not conn_str or not task_id:
+def get_system_name(task_id, db_path):
+    """Query SQLite to get the system name for the report header."""
+    if not db_path or not task_id or str(task_id) in ("", "N/A"):
         return None
     try:
-        import pyodbc
-        conn = pyodbc.connect(conn_str, timeout=10)
+        import sqlite3
+
+        conn = sqlite3.connect(db_path, timeout=10)
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT s.SystemName FROM Systems s
             INNER JOIN CodeReviews cr ON cr.SystemID = s.SystemID
             WHERE cr.TaskID = ?
-        """, int(task_id))
+        """,
+            (int(task_id),),
+        )
         row = cursor.fetchone()
         cursor.close()
         conn.close()
@@ -160,7 +168,7 @@ def generate_html():
     repo_url = os.environ.get('REPO_URL', 'N/A')
     branch = os.environ.get('BRANCH', 'master')
     task_id = os.environ.get('TASK_ID', 'N/A')
-    conn_str = os.environ.get('MSSQL_CONNECTION_STRING', '') or os.environ.get('SQL_CONNECTION_STRING', '')
+    db_path = os.environ.get("SQLITE_DB_PATH", "").strip()
 
     grouped = group_findings(findings)
 
@@ -173,8 +181,8 @@ def generate_html():
     total = len(grouped)
     now = datetime.now(ISRAEL_TZ).strftime('%B %d, %Y %H:%M')
 
-    version = get_scan_version(task_id, conn_str)
-    system_name = get_system_name(task_id, conn_str)
+    version = get_scan_version(task_id, db_path)
+    system_name = get_system_name(task_id, db_path)
 
     categories = collect_categories(grouped)
     scanned_files = collect_scanned_files(grouped)

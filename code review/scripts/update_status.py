@@ -1,40 +1,38 @@
 """
-Update the CodeReview task status in MSSQL.
+Update the CodeReview task status in SQLite.
 Usage: python update_status.py <task_id> <status> [error_summary]
 """
 import os
+import sqlite3
 import sys
 import time
-import pyodbc
-from datetime import datetime
 
 
 def update_status(task_id, status, error_summary=None, max_retries=3):
-    conn_str = os.environ.get('MSSQL_CONNECTION_STRING', '') or os.environ.get('SQL_CONNECTION_STRING', '')
-    if not conn_str:
-        print("ERROR: MSSQL_CONNECTION_STRING not set")
+    path = os.environ.get("SQLITE_DB_PATH", "").strip()
+    if not path:
+        print("ERROR: SQLITE_DB_PATH not set")
         sys.exit(1)
 
     for attempt in range(1, max_retries + 1):
         try:
-            conn = pyodbc.connect(conn_str, timeout=10)
-            conn.timeout = 30
+            conn = sqlite3.connect(path, timeout=30)
             cursor = conn.cursor()
 
-            if status == 'Running':
+            if status == "Running":
                 cursor.execute(
-                    "UPDATE CodeReviews SET Status = ?, StartedAt = GETDATE() WHERE TaskID = ?",
-                    status, task_id
+                    "UPDATE CodeReviews SET Status = ?, StartedAt = datetime('now','localtime') WHERE TaskID = ?",
+                    (status, task_id),
                 )
-            elif status in ('Succeeded', 'Failed'):
+            elif status in ("Succeeded", "Failed"):
                 cursor.execute(
-                    "UPDATE CodeReviews SET Status = ?, FinishedAt = GETDATE(), ErrorSummary = ? WHERE TaskID = ?",
-                    status, error_summary, task_id
+                    "UPDATE CodeReviews SET Status = ?, FinishedAt = datetime('now','localtime'), ErrorSummary = ? WHERE TaskID = ?",
+                    (status, error_summary, task_id),
                 )
             else:
                 cursor.execute(
                     "UPDATE CodeReviews SET Status = ? WHERE TaskID = ?",
-                    status, task_id
+                    (status, task_id),
                 )
 
             conn.commit()
@@ -43,9 +41,9 @@ def update_status(task_id, status, error_summary=None, max_retries=3):
             print(f"Status updated to '{status}' for TaskID {task_id}")
             return
 
-        except pyodbc.Error as e:
-            if '40001' in str(e) and attempt < max_retries:
-                print(f"Deadlock on attempt {attempt}, retrying in {attempt}s...")
+        except sqlite3.OperationalError as e:
+            if "locked" in str(e).lower() and attempt < max_retries:
+                print(f"Database locked on attempt {attempt}, retrying in {attempt}s...")
                 time.sleep(attempt)
                 continue
             print(f"ERROR updating status: {e}")
@@ -55,7 +53,7 @@ def update_status(task_id, status, error_summary=None, max_retries=3):
             sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python update_status.py <task_id> <status> [error_summary]")
         sys.exit(1)

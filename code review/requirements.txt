@@ -1,3 +1,2 @@
-pyodbc
 python-dotenv
 jinja2
