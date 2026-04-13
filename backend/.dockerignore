@@ -1,0 +1,25 @@
+# Ignore environment files - use container env vars instead
+.env
+.env.*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# Archive and output folders
+archive/
+nikto_output/
+

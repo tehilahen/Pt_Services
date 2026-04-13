@@ -1,0 +1,10 @@
+SystemID,Hostname,IP,Port,References,Method,URL,Message,CVSS Score,Severity,CVE,Confidence
+75,adultprobationservice-test.molsa.gov.il,10.23.241.37,443,,GET,/,Retrieved x-powered-by header: ASP.NET.,3,LOW,,medium
+75,adultprobationservice-test.molsa.gov.il,10.23.241.37,443,,GET,/,Retrieved access-control-allow-origin header: *.,3,LOW,,medium
+75,adultprobationservice-test.molsa.gov.il,10.23.241.37,443,https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security,GET,/,The site uses TLS and the Strict-Transport-Security HTTP header is not defined.,3.7,LOW,,medium
+75,adultprobationservice-test.molsa.gov.il,10.23.241.37,443,http://breachattack.com/,GET,/,"The Content-Encoding header is set to \deflate\"" which may mean that the server is vulnerable to the BREACH attack.""",3,LOW,,medium
+75,adultprobationservice-test.molsa.gov.il,10.23.241.37,443,https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy,GET,/,Suggested security header missing: referrer-policy.,3.3,LOW,,medium
+75,adultprobationservice-test.molsa.gov.il,10.23.241.37,443,https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options,GET,/,Suggested security header missing: x-content-type-options.,3.1,LOW,,medium
+75,adultprobationservice-test.molsa.gov.il,10.23.241.37,443,https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy,GET,/,Suggested security header missing: permissions-policy.,3.3,LOW,,medium
+75,adultprobationservice-test.molsa.gov.il,10.23.241.37,443,https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security,GET,/,Suggested security header missing: strict-transport-security.,3.7,LOW,,medium
+75,adultprobationservice-test.molsa.gov.il,10.23.241.37,443,https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP,GET,/,Suggested security header missing: content-security-policy.,3.1,LOW,,medium

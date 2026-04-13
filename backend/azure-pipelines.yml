@@ -1,0 +1,40 @@
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  name: 'AWS'
+
+
+steps:
+- task: Bash@3
+  displayName: docker build
+  inputs:
+    targetType: 'inline'
+    script: |
+      ls -la 
+      docker build \
+        --build-arg HTTP_PROXY=http://192.168.174.80:8080 \
+        --build-arg HTTPS_PROXY=http://192.168.174.80:8080 \
+        --build-arg NO_PROXY=localhost,127.0.0.1 \
+        -t $(molsa_ecr_repository)/$(container_repository):$(container_tag) .
+      
+
+- task: AWSShellScript@1
+  inputs:
+    awsCredentials: 'iam-m-molsa-azuredevops-M-MOLSA-Shared-Services-Security_NiktoWebServerScanner'
+    regionName: 'il-central-1'
+    scriptType: 'inline'
+    inlineScript: 'aws ecr get-login-password | docker login --username AWS --password-stdin $(molsa_ecr_repository)'
+
+
+
+- script: |
+   docker push $(molsa_ecr_repository)/$(container_repository):$(container_tag)
+   
+  displayName: 'Docker Push'
+
+
+- script: 'docker logout $(container_registry)'
+  displayName: 'Docker Logout'

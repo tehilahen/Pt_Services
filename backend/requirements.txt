@@ -1,0 +1,13 @@
+flask==3.0.0
+Flask_Cors
+pyodbc
+python-dotenv
+pandas
+werkzeug
+watchdog==3.0.0
+requests
+urllib3
+PyJWT>=2.8.0
+Jinja2>=3.1.2
+pytz>=2024.1
+docker>=7.0.0

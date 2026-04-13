@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Code Review v10.0 - localhost</title>
+<style>
+  :root {
+    --critical:#dc2626; --critical-bg:#fef2f2; --critical-border:#fca5a5;
+    --high:#ea580c; --high-bg:#fff7ed; --high-border:#fdba74;
+    --medium:#ca8a04; --medium-bg:#fefce8; --medium-border:#fde047;
+    --low:#2563eb; --low-bg:#eff6ff; --low-border:#93c5fd;
+    --bg:#f8fafc; --card:#fff; --text:#1e293b; --muted:#64748b; --border:#e2e8f0;
+    --accent:#0c3058; --accent2:#1e40af;
+    --cat1:#7c3aed; --cat2:#0891b2; --cat3:#059669; --cat4:#d97706;
+    --cat5:#dc2626; --cat6:#2563eb; --cat7:#9333ea; --cat8:#475569;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
+  .container{max-width:1200px;margin:0 auto;padding:24px;}
+  a{color:var(--accent2);text-decoration:none;} a:hover{text-decoration:underline;}
+
+  /* Header */
+  .report-header{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);color:#fff;padding:48px 40px 40px;border-radius:16px;margin-bottom:32px;box-shadow:0 4px 24px rgba(12,48,88,.15);position:relative;overflow:hidden;}
+  .report-header::after{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05);}
+  .report-header h1{font-size:30px;font-weight:700;margin-bottom:4px;letter-spacing:-.5px;}
+  .report-header .subtitle{font-size:16px;opacity:.85;margin-bottom:6px;}
+  .report-header .version{display:inline-block;background:rgba(255,255,255,.18);padding:3px 12px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;margin-bottom:20px;}
+  .header-meta{display:flex;gap:28px;flex-wrap:wrap;font-size:13.5px;opacity:.9;}
+  .header-meta span{display:flex;align-items:center;gap:6px;}
+  .header-meta svg{width:15px;height:15px;fill:currentColor;opacity:.8;}
+
+  /* Summary */
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px;margin-bottom:28px;}
+  .summary-card{background:var(--card);border-radius:12px;padding:22px 16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06);border:1px solid var(--border);transition:transform .2s;}
+  .summary-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+  .summary-card .count{font-size:40px;font-weight:800;line-height:1;}
+  .summary-card .label{font-size:12px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;}
+  .summary-card.critical .count{color:var(--critical);} .summary-card.high .count{color:var(--high);}
+  .summary-card.medium .count{color:var(--medium);} .summary-card.low .count{color:var(--low);}
+  .summary-card.total{border:2px solid var(--accent);} .summary-card.total .count{color:var(--accent);}
+
+  /* Category Nav */
+  .cat-nav{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:28px 32px;margin-bottom:28px;}
+  .cat-nav h3{font-size:18px;color:var(--accent);margin-bottom:16px;font-weight:700;}
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;}
+  .cat-link{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid var(--border);transition:all .15s;font-size:13.5px;color:var(--text);}
+  .cat-link:hover{background:#f1f5f9;text-decoration:none;border-color:#cbd5e1;transform:translateX(3px);}
+  .cat-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .cat-count{margin-left:auto;background:#f1f5f9;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;}
+  .cat-label{flex:1;}
+
+  /* Section */
+  .section{margin-bottom:36px;}
+  .section-anchor{display:block;position:relative;top:-80px;visibility:hidden;}
+  .section-title{font-size:20px;font-weight:700;color:var(--accent);margin-bottom:14px;padding:12px 16px;border-radius:10px;display:flex;align-items:center;gap:10px;}
+  .section-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+
+  /* Finding */
+  .finding{background:var(--card);border-radius:12px;border:1px solid var(--border);margin-bottom:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:box-shadow .2s;}
+  .finding:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);}
+  .finding-header{display:flex;align-items:flex-start;gap:14px;padding:18px 22px;cursor:pointer;user-select:none;}
+  .finding-header:hover{background:#f8fafc;}
+  .severity-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 9px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+  .severity-badge.critical{background:var(--critical);color:#fff;}
+  .severity-badge.high{background:var(--high);color:#fff;}
+  .severity-badge.medium{background:var(--medium);color:#fff;}
+  .severity-badge.low{background:var(--low);color:#fff;}
+  .finding-title{font-size:15px;font-weight:600;flex:1;}
+  .finding-id{font-size:11px;color:var(--muted);font-weight:600;background:#f1f5f9;padding:3px 8px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+  .chevron{width:18px;height:18px;transition:transform .3s;fill:var(--muted);flex-shrink:0;margin-top:3px;}
+  .finding.open .chevron{transform:rotate(180deg);}
+  .finding-body{display:none;padding:0 22px 22px;border-top:1px solid var(--border);}
+  .finding.open .finding-body{display:block;}
+
+  .finding-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:14px 0;padding:14px;background:#f8fafc;border-radius:8px;}
+  .meta-item{font-size:12.5px;} .meta-label{font-weight:600;color:var(--muted);display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px;}
+  .finding-description{font-size:13.5px;line-height:1.7;margin-bottom:14px;}
+  .finding-subsection{margin-top:14px;} .finding-subsection h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;}
+
+  .code-block{background:#1e293b;color:#e2e8f0;padding:14px;border-radius:8px;font-family:'Cascadia Code','Fira Code',Consolas,monospace;font-size:12px;overflow-x:auto;line-height:1.6;white-space:pre;margin-bottom:6px;}
+  .code-block .fp{color:#94a3b8;font-size:10.5px;display:block;margin-bottom:6px;border-bottom:1px solid #334155;padding-bottom:5px;}
+  .code-block .hl{color:#f87171;font-weight:600;} .code-block .ok{color:#4ade80;} .code-block .cm{color:#64748b;}
+
+  .recommendation{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;font-size:13px;color:#166534;line-height:1.65;}
+  .recommendation strong{color:#15803d;}
+  .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+  .tag{font-size:10.5px;padding:2px 7px;border-radius:4px;background:#f1f5f9;color:var(--muted);border:1px solid var(--border);}
+
+  .locations-header{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;margin-top:14px;}
+  .location-count{font-size:11px;color:var(--accent2);font-weight:600;background:#eff6ff;padding:1px 7px;border-radius:8px;margin-left:6px;}
+
+  /* Risk Matrix */
+  .risk-matrix{margin:20px 0;overflow:hidden;border-radius:10px;border:1px solid var(--border);}
+  .risk-matrix table{width:100%;border-collapse:collapse;}
+  .risk-matrix th,.risk-matrix td{padding:10px 14px;text-align:center;font-size:12.5px;border:1px solid var(--border);}
+  .risk-matrix th{background:var(--accent);color:#fff;font-weight:600;text-transform:uppercase;font-size:11px;letter-spacing:.5px;}
+  .risk-matrix td{background:var(--card);}
+  .cell-c{background:var(--critical-bg)!important;color:var(--critical);font-weight:700;}
+  .cell-h{background:var(--high-bg)!important;color:var(--high);font-weight:700;}
+  .cell-m{background:var(--medium-bg)!important;color:var(--medium);font-weight:700;}
+  .cell-l{background:var(--low-bg)!important;color:var(--low);font-weight:700;}
+
+  /* Positive */
+  .positive-list{list-style:none;font-size:13.5px;line-height:2.1;}
+  .positive-list li::before{content:'\2705';margin-right:8px;}
+
+  /* Footer */
+  .report-footer{text-align:center;padding:28px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--border);margin-top:28px;}
+
+  /* Print */
+  @media print{body{background:#fff;} .finding-body{display:block!important;} .report-header,.finding{break-inside:avoid;}}
+
+  /* Files scanned */
+  .files-scanned{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:28px;}
+  .files-scanned h3{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:10px;}
+  .file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:4px;font-family:Consolas,'Courier New',monospace;font-size:12px;color:var(--muted);}
+
+  /* Current state */
+  .state-row-label{font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+  .summary-card.fixed-total{border:2px solid #16a34a;} .summary-card.fixed-total .count{color:#16a34a;}
+  .summary-card .card-sub{font-size:10.5px;color:var(--muted);margin-top:6px;line-height:1.5;}
+  .summary-card .card-sub .sub-fixed{color:#16a34a;font-weight:600;}
+  .summary-card .card-sub .sub-partial{color:#d97706;font-weight:600;}
+  .summary-card .card-sub .sub-open{color:#dc2626;font-weight:600;}
+
+  /* Status badge on findings */
+  .status-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 9px;border-radius:5px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+  .status-badge.fixed{background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0;}
+  .status-badge.partial{background:#fef3c7;color:#d97706;border:1px solid #fde68a;}
+  .status-badge.open-status{background:#fef2f2;color:#dc2626;border:1px solid #fca5a5;}
+
+  /* Current state box inside finding body */
+  .current-state-box{margin:14px 0;padding:14px 16px;border-radius:8px;font-size:13px;line-height:1.7;}
+  .current-state-box.state-fixed{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;}
+  .current-state-box.state-partial{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}
+  .current-state-box.state-open{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;}
+  .current-state-box strong{display:block;margin-bottom:4px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ==================== HEADER ==================== -->
+  <div class="report-header">
+    <div class="version">VERSION 10.0</div>
+    <h1>&#128272; Security Code Review Report</h1>
+    <p class="subtitle">localhost &mdash; Branch: dev</p>
+    <div class="header-meta">
+      <span>
+        <svg viewBox="0 0 16 16"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm-5 6s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3z"/></svg>
+        Author: PT Service - Automated Security Review
+      </span>
+      <span>
+        <svg viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 01.5.5V1h8V.5a.5.5 0 011 0V1h1a2 2 0 012 2v11a2 2 0 01-2 2H2a2 2 0 01-2-2V3a2 2 0 012-2h1V.5a.5.5 0 01.5-.5zM2 3.5v1a.5.5 0 00.5.5h11a.5.5 0 00.5-.5v-1H2zm0 3V14h12V6.5H2z"/></svg>
+        Date: February 26, 2026 12:02
+      </span>
+      <span>
+        <svg viewBox="0 0 16 16"><path d="M14 4.5V14a2 2 0 01-2 2H4a2 2 0 01-2-2V2a2 2 0 012-2h5.5L14 4.5zM9.5 3A1.5 1.5 0 0011 4.5h2V14a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1h5.5v2z"/></svg>
+        Scope: localhost (full codebase)
+      </span>
+      <span>
+        <svg viewBox="0 0 16 16"><path d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.399l-.287.013.089-.416 2.056-.714h.064l-.14.598zM8 5.5a1 1 0 110-2 1 1 0 010 2z"/></svg>
+        Total Findings: 7
+      </span>
+    </div>
+  </div>
+
+  <!-- ==================== SUMMARY ==================== -->
+  <div class="summary-grid">
+    <div class="summary-card total"><div class="count">7</div><div class="label">Total Findings</div></div>
+    <div class="summary-card critical"><div class="count">1</div><div class="label">Critical</div></div>
+    <div class="summary-card high"><div class="count">1</div><div class="label">High</div></div>
+    <div class="summary-card medium"><div class="count">4</div><div class="label">Medium</div></div>
+    <div class="summary-card low"><div class="count">1</div><div class="label">Low</div></div>
+  </div>
+
+  <!-- ==================== CURRENT REMEDIATION STATE ==================== -->
+  <div class="state-row-label">Current Remediation State (as of February 26, 2026 12:02)</div>
+  <div class="summary-grid">
+    <div class="summary-card fixed-total">
+      <div class="count">0<span style="font-size:18px;font-weight:400;color:var(--muted);">/7</span></div>
+      <div class="label">Fixed</div>
+      
+      <div class="card-sub"><span class="sub-open">7 open</span></div>
+    </div>
+    
+    
+    
+    
+    <div class="summary-card critical">
+      <div class="count">1<span style="font-size:18px;font-weight:400;color:var(--muted);">/1</span></div>
+      <div class="label">Critical Remaining</div>
+      <div class="card-sub">
+        
+        
+        
+        
+        <span class="sub-open">1 open</span>
+        
+      </div>
+    </div>
+    
+    
+    
+    
+    <div class="summary-card high">
+      <div class="count">1<span style="font-size:18px;font-weight:400;color:var(--muted);">/1</span></div>
+      <div class="label">High Remaining</div>
+      <div class="card-sub">
+        
+        
+        
+        
+        <span class="sub-open">1 open</span>
+        
+      </div>
+    </div>
+    
+    
+    
+    
+    <div class="summary-card medium">
+      <div class="count">4<span style="font-size:18px;font-weight:400;color:var(--muted);">/4</span></div>
+      <div class="label">Medium Remaining</div>
+      <div class="card-sub">
+        
+        
+        
+        
+        <span class="sub-open">4 open</span>
+        
+      </div>
+    </div>
+    
+    
+    
+    
+    <div class="summary-card low">
+      <div class="count">1<span style="font-size:18px;font-weight:400;color:var(--muted);">/1</span></div>
+      <div class="label">Low Remaining</div>
+      <div class="card-sub">
+        
+        
+        
+        
+        <span class="sub-open">1 open</span>
+        
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- ==================== RISK MATRIX ==================== -->
+  <div class="risk-matrix">
+    <table>
+      <thead><tr><th>Impact / Probability</th><th>Low</th><th>Medium</th><th>High</th><th>Very High</th></tr></thead>
+      <tbody>
+        
+        
+        <tr><td style="font-weight:600;background:#f8fafc;text-align:left;">Critical</td><td class="cell-h">High</td><td class="cell-c">Critical</td><td class="cell-c">Critical</td><td class="cell-c">Critical</td></tr>
+        
+        
+        <tr><td style="font-weight:600;background:#f8fafc;text-align:left;">High</td><td class="cell-m">Medium</td><td class="cell-h">High</td><td class="cell-c">Critical</td><td class="cell-c">Critical</td></tr>
+        
+        
+        <tr><td style="font-weight:600;background:#f8fafc;text-align:left;">Medium</td><td class="cell-l">Low</td><td class="cell-m">Medium</td><td class="cell-h">High</td><td class="cell-h">High</td></tr>
+        
+        
+        <tr><td style="font-weight:600;background:#f8fafc;text-align:left;">Low</td><td class="cell-l">Low</td><td class="cell-l">Low</td><td class="cell-m">Medium</td><td class="cell-m">Medium</td></tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ==================== CATEGORY NAVIGATION ==================== -->
+  
+  <div class="cat-nav">
+    <h3>Finding Categories</h3>
+    <div class="cat-grid">
+      
+      <a class="cat-link" href="#cat-general"><span class="cat-dot" style="background:var(--cat1);"></span><span class="cat-label">General</span><span class="cat-count">7</span></a>
+      
+    </div>
+  </div>
+  
+
+  <!-- ==================== FILES SCANNED ==================== -->
+  
+  <div class="files-scanned">
+    <h3>Files Scanned (13 files)</h3>
+    <div class="file-grid">
+      
+      <span>Dockerfile</span>
+      
+      <span>src/api_server.py</span>
+      
+      <span>src/csv_parser.py</span>
+      
+      <span>src/database.py</span>
+      
+      <span>src/nikto_executor.py</span>
+      
+      <span>src/jwt_auth.py</span>
+      
+      <span>src/availability_checker.py</span>
+      
+      <span>src/nvd_api_client.py</span>
+      
+      <span>src/stitch/scripts/example_scan.py</span>
+      
+      <span>src/cvss_mapper.py</span>
+      
+      <span>src/email_service.py</span>
+      
+      <span>src/file_watcher.py</span>
+      
+      <span>src/stitch/stitch_executor.py</span>
+      
+    </div>
+  </div>
+  
+
+  <!-- ==================== FINDINGS BY CATEGORY ==================== -->
+  
+  
+  <span class="section-anchor" id="cat-general"></span>
+  <div class="section">
+    <h2 class="section-title"><span class="section-dot" style="background:var(--cat1);"></span>General</h2>
+
+    
+    <div class="finding" id="SEC-001">
+      <div class="finding-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="severity-badge medium">Medium</span>
+        <span class="finding-title">Debug Mode Enabled in Production</span>
+        
+        <span class="finding-id">SEC-001</span>
+        <svg class="chevron" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+      </div>
+      <div class="finding-body">
+        <div class="finding-meta">
+          <div class="meta-item"><span class="meta-label">Severity</span> Medium</div>
+          <div class="meta-item"><span class="meta-label">Probability</span> High</div>
+          
+          
+        </div>
+        <div class="finding-description">Found in Dockerfile at line 39: Debug Mode Enabled in Production</div>
+
+        
+        <div class="finding-subsection">
+          <h4>Affected Locations <span class="location-count">1</span></h4>
+          
+          
+          <div class="code-block"><span class="fp">Dockerfile (line 39)</span>    FLASK_PORT=5000 \
+    FLASK_DEBUG=True \
+    WATCH_FOLDER="nikto output" \
+    ARCHIVE_FOLDER=archive</div>
+          
+          
+        </div>
+        
+
+        
+        <div class="finding-subsection">
+          <h4>Recommendation</h4>
+          <div class="recommendation">Disable debug mode in production. Use environment variables to control debug settings.</div>
+        </div>
+        
+
+        
+        <div class="tags"><span class="tag">configuration</span><span class="tag">debug</span><span class="tag">owasp-a5</span></div>
+        
+      </div>
+    </div>
+    
+    <div class="finding" id="SEC-002">
+      <div class="finding-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="severity-badge medium">Medium</span>
+        <span class="finding-title">CORS Wildcard or Overly Permissive</span>
+        
+        <span class="finding-id">SEC-002</span>
+        <svg class="chevron" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+      </div>
+      <div class="finding-body">
+        <div class="finding-meta">
+          <div class="meta-item"><span class="meta-label">Severity</span> Medium</div>
+          <div class="meta-item"><span class="meta-label">Probability</span> Medium</div>
+          
+          
+        </div>
+        <div class="finding-description">Found in src/api_server.py at line 165: CORS Wildcard or Overly Permissive</div>
+
+        
+        <div class="finding-subsection">
+          <h4>Affected Locations <span class="location-count">11</span></h4>
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 165)</span>            })
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 400
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 178)</span>            })
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 400
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 189)</span>            })
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 404
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 199)</span>            })
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 400
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 240)</span>            })
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 503  # Service Unavailable
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 262)</span>            })
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 500
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 281)</span>        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 291)</span>        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 500
+</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 341)</span>            })
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response, 404
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 364)</span>        response = jsonify(response_data)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 200
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 374)</span>        })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response, 500
+</div>
+          
+          
+        </div>
+        
+
+        
+        <div class="finding-subsection">
+          <h4>Recommendation</h4>
+          <div class="recommendation">Restrict CORS to specific trusted origins instead of using wildcard (*).</div>
+        </div>
+        
+
+        
+        <div class="tags"><span class="tag">cors</span><span class="tag">owasp-a5</span><span class="tag">configuration</span></div>
+        
+      </div>
+    </div>
+    
+    <div class="finding" id="SEC-013">
+      <div class="finding-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="severity-badge low">Low</span>
+        <span class="finding-title">Detailed Error Information Exposed</span>
+        
+        <span class="finding-id">SEC-013</span>
+        <svg class="chevron" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+      </div>
+      <div class="finding-body">
+        <div class="finding-meta">
+          <div class="meta-item"><span class="meta-label">Severity</span> Low</div>
+          <div class="meta-item"><span class="meta-label">Probability</span> High</div>
+          
+          
+        </div>
+        <div class="finding-description">Found in src/api_server.py at line 1431: Detailed Error Information Exposed</div>
+
+        
+        <div class="finding-subsection">
+          <h4>Affected Locations <span class="location-count">15</span></h4>
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 1431)</span>        logger.error(f"שגיאה בשליפת מעקב PT: {str(e)}")
+        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500
+
+</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 1463)</span>        logger.error(f"שגיאה ביצירת מעקב PT: {str(e)}")
+        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500
+
+</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 1522)</span>        logger.error(f"שגיאה בשליחת תזכורות PT: {str(e)}")
+        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500
+
+</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 1538)</span>        logger.error(f"שגיאה בשליפת מעקב PT: {str(e)}")
+        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500
+
+</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 1569)</span>        logger.error(f"שגיאה בעדכון מעקב PT: {str(e)}")
+        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500
+
+</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 1585)</span>        logger.error(f"שגיאה במחיקת מעקב PT: {str(e)}")
+        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500
+
+# רישום כפול של pt-tracking בלי קידומת /api (תאימות לפרוקסי שמקצץ את /api)</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 1689)</span>    except ValueError as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+    except Exception as e:
+        logger.error(f"שגיאה בהפעלת סריקת קוד: {str(e)}")</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/csv_parser.py (line 236)</span>            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return False
+    </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/csv_parser.py (line 520)</span>            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return False
+    </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/database.py (line 1086)</span>            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return None
+    </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/database.py (line 1225)</span>            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return None
+    </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/database.py (line 1327)</span>            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return None
+    </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/database.py (line 1459)</span>            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return None
+    </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/database.py (line 1573)</span>            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return None
+</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/nikto_executor.py (line 260)</span>            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            # ניסיון למחוק קובץ זמני אם קיים
+            try:</div>
+          
+          
+        </div>
+        
+
+        
+        <div class="finding-subsection">
+          <h4>Recommendation</h4>
+          <div class="recommendation">Do not expose internal error details to users. Log the full error server-side and return generic error messages.</div>
+        </div>
+        
+
+        
+        <div class="tags"><span class="tag">information-disclosure</span><span class="tag">owasp-a6</span></div>
+        
+      </div>
+    </div>
+    
+    <div class="finding" id="SEC-020">
+      <div class="finding-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="severity-badge medium">Medium</span>
+        <span class="finding-title">Authentication Endpoint Without Rate Limiting</span>
+        
+        <span class="finding-id">SEC-020</span>
+        <svg class="chevron" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+      </div>
+      <div class="finding-body">
+        <div class="finding-meta">
+          <div class="meta-item"><span class="meta-label">Severity</span> Medium</div>
+          <div class="meta-item"><span class="meta-label">Probability</span> Medium</div>
+          
+          
+        </div>
+        <div class="finding-description">Found in src/api_server.py at line 119: Authentication Endpoint Without Rate Limiting</div>
+
+        
+        <div class="finding-subsection">
+          <h4>Affected Locations <span class="location-count">2</span></h4>
+          
+          
+          <div class="code-block"><span class="fp">src/api_server.py (line 119)</span>
+@app.route('/', methods=['GET'])
+def health_check():
+    """בדיקת תקינות השרת"""</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/jwt_auth.py (line 110)</span>    שימוש:
+        @app.route('/api/protected')
+        @jwt_required
+        def protected_route(current_user):</div>
+          
+          
+        </div>
+        
+
+        
+        <div class="finding-subsection">
+          <h4>Recommendation</h4>
+          <div class="recommendation">Add rate limiting to authentication endpoints to prevent brute force attacks.</div>
+        </div>
+        
+
+        
+        <div class="tags"><span class="tag">brute-force</span><span class="tag">rate-limiting</span><span class="tag">owasp-a7</span></div>
+        
+      </div>
+    </div>
+    
+    <div class="finding" id="SEC-021">
+      <div class="finding-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="severity-badge medium">Medium</span>
+        <span class="finding-title">SSL Certificate Verification Disabled</span>
+        
+        <span class="finding-id">SEC-021</span>
+        <svg class="chevron" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+      </div>
+      <div class="finding-body">
+        <div class="finding-meta">
+          <div class="meta-item"><span class="meta-label">Severity</span> Medium</div>
+          <div class="meta-item"><span class="meta-label">Probability</span> Medium</div>
+          
+          
+        </div>
+        <div class="finding-description">Found in src/availability_checker.py at line 95: SSL Certificate Verification Disabled</div>
+
+        
+        <div class="finding-subsection">
+          <h4>Affected Locations <span class="location-count">7</span></h4>
+          
+          
+          <div class="code-block"><span class="fp">src/availability_checker.py (line 95)</span>                    allow_redirects=True,
+                    verify=False  # לא מאמת SSL certificates (לצורכי בדיקה)
+                )
+            except requests.exceptions.RequestException:</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/availability_checker.py (line 104)</span>                    allow_redirects=True,
+                    verify=False,
+                    stream=True  # לא מוריד את כל התוכן
+                )</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/nvd_api_client.py (line 52)</span>        # Make API request
+        # Note: verify=False is used here for compatibility, but should be True in production
+        response = requests.get(url, headers=headers, timeout=timeout, verify=False)
+        </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/nvd_api_client.py (line 53)</span>        # Note: verify=False is used here for compatibility, but should be True in production
+        response = requests.get(url, headers=headers, timeout=timeout, verify=False)
+        
+        if response.status_code == 200:</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/stitch/scripts/example_scan.py (line 42)</span>    try:
+        response = requests.get(url, timeout=timeout, verify=False)
+        
+        # Headers חשובים לאבטחה</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/stitch/scripts/example_scan.py (line 159)</span>    try:
+        response = requests.get(url, timeout=timeout, verify=False)
+        
+        for cookie in response.cookies:</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/stitch/scripts/example_scan.py (line 202)</span>    try:
+        response = requests.get(url, timeout=timeout, verify=False)
+        content = response.text.lower()
+        </div>
+          
+          
+        </div>
+        
+
+        
+        <div class="finding-subsection">
+          <h4>Recommendation</h4>
+          <div class="recommendation">Always verify SSL certificates. Disabling verification allows MITM attacks.</div>
+        </div>
+        
+
+        
+        <div class="tags"><span class="tag">ssl</span><span class="tag">tls</span><span class="tag">owasp-a2</span></div>
+        
+      </div>
+    </div>
+    
+    <div class="finding" id="SEC-023">
+      <div class="finding-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="severity-badge high">High</span>
+        <span class="finding-title">Potential Path Traversal</span>
+        
+        <span class="finding-id">SEC-023</span>
+        <svg class="chevron" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+      </div>
+      <div class="finding-body">
+        <div class="finding-meta">
+          <div class="meta-item"><span class="meta-label">Severity</span> High</div>
+          <div class="meta-item"><span class="meta-label">Probability</span> Medium</div>
+          
+          
+        </div>
+        <div class="finding-description">Found in src/csv_parser.py at line 67: Potential Path Traversal</div>
+
+        
+        <div class="finding-subsection">
+          <h4>Affected Locations <span class="location-count">11</span></h4>
+          
+          
+          <div class="code-block"><span class="fp">src/csv_parser.py (line 67)</span>                    # בדיקה אם זה קובץ CVSS החדש (מתחיל בשורת כותרת מיוחדת)
+                    with open(file_path, 'r', encoding=encoding) as f:
+                        first_line = f.readline().strip()
+                        if 'Nikto - v2.5.0/ (with CVSS)' in first_line:</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/cvss_mapper.py (line 35)</span>        if config_file is None:
+            config_file = os.path.join(os.path.dirname(__file__), 'cvss_mappings.json')
+        self.config_file = config_file
+        self.load_mappings()</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/cvss_mapper.py (line 283)</span>        }
+        with open(filename, 'w') as f:
+            json.dump(config, f, indent=2)
+    </div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/email_service.py (line 24)</span># הגדרת Jinja2 לתבניות מייל
+TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'email')
+jinja_env = Environment(
+    loader=FileSystemLoader(TEMPLATES_DIR),</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/file_watcher.py (line 85)</span>        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                first_line = f.readline().strip()
+                second_line = f.readline().strip()</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/nikto_executor.py (line 80)</span>            has_cvss = False
+            with open(csv_file_path, 'r', encoding='utf-8', newline='') as f:
+                first_line = f.readline()
+                if '(with CVSS)' in first_line:</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/nikto_executor.py (line 87)</span>            # קריאת הקובץ המקורי וכתיבת הקובץ החדש
+            with open(csv_file_path, 'r', encoding='utf-8', newline='') as infile:
+                with open(temp_file, 'w', encoding='utf-8', newline='') as outfile:
+                    # קריאת השורה הראשונה (header של Nikto) - נדלג עליה</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/nikto_executor.py (line 167)</span>            # קריאת הקובץ המקורי וכתיבת הקובץ החדש
+            with open(csv_file_path, 'r', encoding='utf-8', newline='') as infile:
+                with open(temp_file, 'w', encoding='utf-8', newline='') as outfile:
+                    # קריאת header עם SystemID (אין יותר header של Nikto אחרי _add_system_id_to_csv)</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/nikto_executor.py (line 293)</span>            # החזרת נתיב מלא (absolute path)
+            filepath = os.path.join(output_dir, filename)
+            # Ensure absolute path
+            filepath = os.path.abspath(filepath)</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/nikto_executor.py (line 303)</span>            filename = f"{now.strftime('%d%m%Y-%H%M')}-system-{system_id}.csv"
+            return os.path.join(output_dir, filename)
+    
+    def build_nikto_command(self, target_url, output_file):</div>
+          
+          
+          
+          <div class="code-block"><span class="fp">src/stitch/stitch_executor.py (line 93)</span>        try:
+            with open(script_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                </div>
+          
+          
+        </div>
+        
+
+        
+        <div class="finding-subsection">
+          <h4>Recommendation</h4>
+          <div class="recommendation">Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.</div>
+        </div>
+        
+
+        
+        <div class="tags"><span class="tag">path-traversal</span><span class="tag">owasp-a1</span><span class="tag">lfi</span></div>
+        
+      </div>
+    </div>
+    
+    <div class="finding" id="SEC-028">
+      <div class="finding-header" onclick="this.parentElement.classList.toggle('open')">
+        <span class="severity-badge critical">Critical</span>
+        <span class="finding-title">Potential SQL Injection</span>
+        
+        <span class="finding-id">SEC-028</span>
+        <svg class="chevron" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+      </div>
+      <div class="finding-body">
+        <div class="finding-meta">
+          <div class="meta-item"><span class="meta-label">Severity</span> Critical</div>
+          <div class="meta-item"><span class="meta-label">Probability</span> High</div>
+          
+          
+        </div>
+        <div class="finding-description">Found in src/database.py at line 133: Potential SQL Injection</div>
+
+        
+        <div class="finding-subsection">
+          <h4>Affected Locations <span class="location-count">1</span></h4>
+          
+          
+          <div class="code-block"><span class="fp">src/database.py (line 133)</span>                    raise ValueError(f"שם מסד נתונים לא חוקי: {self.database}")
+                cursor.execute(f"CREATE DATABASE [{safe_db_name}]")
+                self.connection.commit()
+            </div>
+          
+          
+        </div>
+        
+
+        
+        <div class="finding-subsection">
+          <h4>Recommendation</h4>
+          <div class="recommendation">Use parameterized queries (? placeholders) instead of string formatting in SQL statements.</div>
+        </div>
+        
+
+        
+        <div class="tags"><span class="tag">sql-injection</span><span class="tag">owasp-a3</span><span class="tag">injection</span></div>
+        
+      </div>
+    </div>
+    
+  </div>
+  
+
+  
+
+  <!-- ==================== SUMMARY TABLE ==================== -->
+  <div class="section">
+    <h2 class="section-title">Prioritized Remediation Plan</h2>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;background:white;border-radius:12px;overflow:hidden;border:1px solid var(--border);">
+        <thead>
+          <tr style="background:var(--accent);color:white;">
+            <th style="padding:10px 14px;text-align:left;width:30px;">#</th>
+            <th style="padding:10px 14px;text-align:left;width:70px;">ID</th>
+            <th style="padding:10px 14px;text-align:left;">Finding</th>
+            <th style="padding:10px 14px;text-align:center;width:70px;">Severity</th>
+            <th style="padding:10px 14px;text-align:center;width:80px;">Probability</th>
+            <th style="padding:10px 14px;text-align:center;width:90px;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          
+          <tr style="background:var(--medium-bg);cursor:pointer;" onclick="var e=document.getElementById('SEC-001');if(e){e.scrollIntoView({behavior:'smooth'});e.classList.add('open');}">
+            <td style="padding:8px 14px;font-weight:700;">1</td>
+            <td style="padding:8px 14px;"><a href="#SEC-001">SEC-001</a></td>
+            <td style="padding:8px 14px;">Debug Mode Enabled in Production</td>
+            <td style="padding:8px 14px;text-align:center;color:var(--medium);font-weight:700;">Medium</td>
+            <td style="padding:8px 14px;text-align:center;">High</td>
+            <td style="padding:8px 14px;text-align:center;"><span style="background:#fef2f2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">OPEN</span></td>
+          </tr>
+          
+          <tr style="background:var(--medium-bg);cursor:pointer;" onclick="var e=document.getElementById('SEC-002');if(e){e.scrollIntoView({behavior:'smooth'});e.classList.add('open');}">
+            <td style="padding:8px 14px;font-weight:700;">2</td>
+            <td style="padding:8px 14px;"><a href="#SEC-002">SEC-002</a></td>
+            <td style="padding:8px 14px;">CORS Wildcard or Overly Permissive</td>
+            <td style="padding:8px 14px;text-align:center;color:var(--medium);font-weight:700;">Medium</td>
+            <td style="padding:8px 14px;text-align:center;">Medium</td>
+            <td style="padding:8px 14px;text-align:center;"><span style="background:#fef2f2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">OPEN</span></td>
+          </tr>
+          
+          <tr style="background:var(--low-bg);cursor:pointer;" onclick="var e=document.getElementById('SEC-013');if(e){e.scrollIntoView({behavior:'smooth'});e.classList.add('open');}">
+            <td style="padding:8px 14px;font-weight:700;">3</td>
+            <td style="padding:8px 14px;"><a href="#SEC-013">SEC-013</a></td>
+            <td style="padding:8px 14px;">Detailed Error Information Exposed</td>
+            <td style="padding:8px 14px;text-align:center;color:var(--low);font-weight:700;">Low</td>
+            <td style="padding:8px 14px;text-align:center;">High</td>
+            <td style="padding:8px 14px;text-align:center;"><span style="background:#fef2f2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">OPEN</span></td>
+          </tr>
+          
+          <tr style="background:var(--medium-bg);cursor:pointer;" onclick="var e=document.getElementById('SEC-020');if(e){e.scrollIntoView({behavior:'smooth'});e.classList.add('open');}">
+            <td style="padding:8px 14px;font-weight:700;">4</td>
+            <td style="padding:8px 14px;"><a href="#SEC-020">SEC-020</a></td>
+            <td style="padding:8px 14px;">Authentication Endpoint Without Rate Limiting</td>
+            <td style="padding:8px 14px;text-align:center;color:var(--medium);font-weight:700;">Medium</td>
+            <td style="padding:8px 14px;text-align:center;">Medium</td>
+            <td style="padding:8px 14px;text-align:center;"><span style="background:#fef2f2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">OPEN</span></td>
+          </tr>
+          
+          <tr style="background:var(--medium-bg);cursor:pointer;" onclick="var e=document.getElementById('SEC-021');if(e){e.scrollIntoView({behavior:'smooth'});e.classList.add('open');}">
+            <td style="padding:8px 14px;font-weight:700;">5</td>
+            <td style="padding:8px 14px;"><a href="#SEC-021">SEC-021</a></td>
+            <td style="padding:8px 14px;">SSL Certificate Verification Disabled</td>
+            <td style="padding:8px 14px;text-align:center;color:var(--medium);font-weight:700;">Medium</td>
+            <td style="padding:8px 14px;text-align:center;">Medium</td>
+            <td style="padding:8px 14px;text-align:center;"><span style="background:#fef2f2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">OPEN</span></td>
+          </tr>
+          
+          <tr style="background:var(--high-bg);cursor:pointer;" onclick="var e=document.getElementById('SEC-023');if(e){e.scrollIntoView({behavior:'smooth'});e.classList.add('open');}">
+            <td style="padding:8px 14px;font-weight:700;">6</td>
+            <td style="padding:8px 14px;"><a href="#SEC-023">SEC-023</a></td>
+            <td style="padding:8px 14px;">Potential Path Traversal</td>
+            <td style="padding:8px 14px;text-align:center;color:var(--high);font-weight:700;">High</td>
+            <td style="padding:8px 14px;text-align:center;">Medium</td>
+            <td style="padding:8px 14px;text-align:center;"><span style="background:#fef2f2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">OPEN</span></td>
+          </tr>
+          
+          <tr style="background:var(--critical-bg);cursor:pointer;" onclick="var e=document.getElementById('SEC-028');if(e){e.scrollIntoView({behavior:'smooth'});e.classList.add('open');}">
+            <td style="padding:8px 14px;font-weight:700;">7</td>
+            <td style="padding:8px 14px;"><a href="#SEC-028">SEC-028</a></td>
+            <td style="padding:8px 14px;">Potential SQL Injection</td>
+            <td style="padding:8px 14px;text-align:center;color:var(--critical);font-weight:700;">Critical</td>
+            <td style="padding:8px 14px;text-align:center;">High</td>
+            <td style="padding:8px 14px;text-align:center;"><span style="background:#fef2f2;color:#dc2626;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;">OPEN</span></td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <div class="report-footer">
+    <p><strong>localhost &mdash; Security Code Review v10.0</strong></p>
+    <p>Author: PT Service - Automated Security Review &nbsp;|&nbsp; Date: February 26, 2026 12:02 (Israel Time)</p>
+    <p style="margin-top:6px;font-size:11.5px;color:#94a3b8;">13 source files scanned &nbsp;|&nbsp; 7 findings (1 Critical, 1 High, 4 Medium, 1 Low)</p>
+    <p style="margin-top:4px;font-size:11.5px;color:#64748b;font-weight:600;">Remediation: 0 Fixed &nbsp;|&nbsp; 0 Partially Fixed &nbsp;|&nbsp; 7 Open</p>
+  </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.finding').forEach(f=>{
+    if(f.querySelector('.severity-badge.critical'))f.classList.add('open');
+  });
+});
+</script>
+
+</body>
+</html>

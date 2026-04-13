@@ -1,0 +1,178 @@
+###############################################################################
+#  Copyright (C) 2024 CVSS Integration Team
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to
+#  Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+###############################################################################
+# PURPOSE:
+# CVSS Integration for Nikto - Maps findings to CVSS scores and severity levels
+###############################################################################
+
+use strict;
+use JSON::PP;
+
+# Global variables for CVSS integration
+my %CVSS_CACHE = ();
+my $CVSS_ENABLED = 0;
+my $CVSS_USE_NVD = 0;
+my $CVSS_PYTHON_PATH = "python3";
+my $CVSS_INTEGRATION_SCRIPT = "nikto_cvss_integration.py";
+
+sub nikto_cvss_integration_init {
+    my $id = { 
+        name              => "cvss_integration",
+        full_name         => "CVSS Integration",
+        author            => "CVSS Integration Team",
+        description       => "Maps Nikto findings to CVSS scores and severity levels",
+        copyright         => "2024 CVSS Integration Team"
+    };
+    return $id;
+}
+
+sub cvss_integration_load {
+    # Load CVSS integration settings from configuration
+    
+    # Check if CVSS integration is enabled
+    $CVSS_ENABLED = $CONFIGFILE{'CVSS_ENABLED'} || 0;
+    $CVSS_USE_NVD = $CONFIGFILE{'CVSS_USE_NVD'} || 0;
+    $CVSS_PYTHON_PATH = $CONFIGFILE{'CVSS_PYTHON_PATH'} || "python3";
+    $CVSS_INTEGRATION_SCRIPT = $CONFIGFILE{'CVSS_INTEGRATION_SCRIPT'} || "nikto_cvss_integration.py";
+    
+    if ($CVSS_ENABLED) {
+        nprint("+ CVSS Integration enabled", "v");
+        nprint("+ NVD API lookups: " . ($CVSS_USE_NVD ? "enabled" : "disabled"), "v");
+    }
+}
+
+sub get_cvss_for_finding {
+    # Get CVSS information for a Nikto finding
+    my ($finding_text) = @_;
+    
+    return unless $CVSS_ENABLED;
+    
+    # Check cache first
+    if (exists $CVSS_CACHE{$finding_text}) {
+        return $CVSS_CACHE{$finding_text};
+    }
+    
+    # Call Python CVSS integration script
+    my $cvss_result = call_cvss_integration($finding_text);
+    
+    if ($cvss_result) {
+        # Cache the result
+        $CVSS_CACHE{$finding_text} = $cvss_result;
+        return $cvss_result;
+    }
+    
+    return undef;
+}
+
+sub call_cvss_integration {
+    # Call the Python CVSS integration script
+    my ($finding_text) = @_;
+    
+    # Prepare JSON input
+    my $json_input = encode_json({
+        "finding" => $finding_text
+    });
+    
+    # Build command
+    my $cmd = "$CVSS_PYTHON_PATH $CVSS_INTEGRATION_SCRIPT --json";
+    if ($CVSS_USE_NVD) {
+        $cmd .= " --use-nvd";
+    }
+    
+    # Execute command and capture output
+    my $output = `echo '$json_input' | $cmd 2>/dev/null`;
+    
+    if ($output) {
+        eval {
+            my $result = decode_json($output);
+            return $result;
+        };
+        if ($@) {
+            nprint("+ Warning: Failed to parse CVSS result: $@", "v");
+        }
+    }
+    
+    return undef;
+}
+
+sub add_cvss_to_vulnerability {
+    # Add CVSS information to a vulnerability result
+    my ($mark, $item, $message) = @_;
+    
+    return unless $CVSS_ENABLED;
+    
+    # Get CVSS information
+    my $cvss_info = get_cvss_for_finding($message);
+    
+    if ($cvss_info) {
+        # Add CVSS fields to the vulnerability item
+        $item->{'cvss_score'} = $cvss_info->{'cvss'};
+        $item->{'severity'} = $cvss_info->{'severity'};
+        $item->{'cvss_confidence'} = $cvss_info->{'confidence'};
+        
+        if ($cvss_info->{'cve'}) {
+            $item->{'cve'} = $cvss_info->{'cve'};
+        }
+        
+        # Update the message to include severity
+        $item->{'message'} = "[$cvss_info->{'severity'}] $message";
+        
+        nprint("+ CVSS: $cvss_info->{'cvss'} ($cvss_info->{'severity'})", "v");
+    }
+}
+
+sub generate_cvss_summary {
+    # Generate a CVSS severity summary for the scan results
+    my ($mark) = @_;
+    
+    return unless $CVSS_ENABLED;
+    
+    my %severity_counts = (
+        'CRITICAL' => 0,
+        'HIGH' => 0,
+        'MEDIUM' => 0,
+        'LOW' => 0,
+        'INFORMATIONAL' => 0
+    );
+    
+    my %severity_findings = ();
+    
+    # Count vulnerabilities by severity
+    foreach my $result (@RESULTS) {
+        if ($result->{'severity'}) {
+            my $severity = $result->{'severity'};
+            $severity_counts{$severity}++;
+            push @{$severity_findings{$severity}}, $result;
+        }
+    }
+    
+    # Print summary
+    nprint("+ CVSS Severity Summary:", "");
+    nprint("+   CRITICAL: $severity_counts{'CRITICAL'}", "");
+    nprint("+   HIGH: $severity_counts{'HIGH'}", "");
+    nprint("+   MEDIUM: $severity_counts{'MEDIUM'}", "");
+    nprint("+   LOW: $severity_counts{'LOW'}", "");
+    nprint("+   INFORMATIONAL: $severity_counts{'INFORMATIONAL'}", "");
+    
+    return {
+        'counts' => \%severity_counts,
+        'findings' => \%severity_findings
+    };
+}
+
+1;
+

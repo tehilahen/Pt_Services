@@ -1,0 +1,54 @@
+
+services:
+  pt-service-backend:
+    image: 684610983594.dkr.ecr.il-central-1.amazonaws.com/global-repo:PT_Service_backend
+    container_name: pt-service-backend
+    expose:
+      - "5000"  # Internal only - not exposed externally
+    environment:
+      - SQL_CONNECTION_STRING=Driver={ODBC Driver 17 for SQL Server};Server=SQLDEV.molsa.gov.il;Database=SA_DTI_Security_NiktoWebServerScanner;UID=ptuser;PWD=ptuser1993!;TrustServerCertificate=yes;
+      - TFS_PAT=${TFS_PAT}
+      - TFS_BASE_URL=${TFS_BASE_URL}
+      - CODE_REVIEWER_IMAGE=code-reviewer:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker socket for code review orchestrator
+    networks:
+      - pt-service-network
+    restart: unless-stopped
+
+  pt-service-frontend:
+    image: 684610983594.dkr.ecr.il-central-1.amazonaws.com/global-repo:PT_Service_frontend
+    depends_on:
+      - pt-service-backend
+    container_name: pt-service-frontend
+    expose:
+      - "3000"  # Internal only - not exposed externally. Access only through nginx on port 443
+    environment:
+      - HOST=0.0.0.0
+      - HTTP_PROXY=http://192.168.174.80:8080
+      - HTTPS_PROXY=http://192.168.174.80:8080
+      - NO_PROXY=localhost,127.0.0.1
+    networks:
+      - pt-service-network
+    restart: unless-stopped
+
+
+  nginx-pt_service:
+    build:
+      context: .   # path to the folder containing the Dockerfile
+      dockerfile: Dockerfile        # optional if the file is named 'Dockerfile'
+    depends_on:
+      - pt-service-backend
+      - pt-service-frontend
+    container_name: nginx-pt_service
+    ports:
+      - "443:443"  # HTTPS only
+    volumes:
+      - ./cert_files:/etc/nginx/ssl
+    networks:
+      - pt-service-network
+    restart: unless-stopped
+
+networks:
+  pt-service-network:
+    driver: bridge

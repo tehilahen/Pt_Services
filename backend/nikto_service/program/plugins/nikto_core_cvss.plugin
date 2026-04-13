@@ -1,0 +1,130 @@
+###############################################################################
+# Modified add_vulnerability function with CVSS integration
+# This shows how to modify the existing nikto_core.plugin
+###############################################################################
+
+# Add this near the top of nikto_core.plugin, after other sub declarations
+sub add_cvss_to_vulnerability {
+    # Add CVSS information to a vulnerability result
+    my ($mark, $item, $message) = @_;
+    
+    # Check if CVSS integration is enabled
+    return unless $CONFIGFILE{'CVSS_ENABLED'};
+    
+    # Get CVSS information using our Python integration
+    my $cvss_info = get_cvss_for_finding($message);
+    
+    if ($cvss_info) {
+        # Add CVSS fields to the vulnerability item
+        $item->{'cvss_score'} = $cvss_info->{'cvss'};
+        $item->{'severity'} = $cvss_info->{'severity'};
+        $item->{'cvss_confidence'} = $cvss_info->{'confidence'};
+        
+        if ($cvss_info->{'cve'}) {
+            $item->{'cve'} = $cvss_info->{'cve'};
+        }
+        
+        # Update the message to include severity
+        $item->{'message'} = "[$cvss_info->{'severity'}] $message";
+        
+        nprint("+ CVSS: $cvss_info->{'cvss'} ($cvss_info->{'severity'})", "v");
+    }
+}
+
+sub get_cvss_for_finding {
+    # Get CVSS information for a Nikto finding
+    my ($finding_text) = @_;
+    
+    # Check cache first (you can implement caching here)
+    # For now, we'll call the Python script each time
+    
+    # Prepare JSON input
+    my $json_input = encode_json({
+        "finding" => $finding_text
+    });
+    
+    # Build command
+    my $cmd = "python nikto_cvss_integration.py --json";
+    if ($CONFIGFILE{'CVSS_USE_NVD'}) {
+        $cmd .= " --use-nvd";
+    }
+    
+    # Execute command and capture output
+    my $output = `echo '$json_input' | $cmd 2>/dev/null`;
+    
+    if ($output) {
+        eval {
+            my $result = decode_json($output);
+            return $result;
+        };
+        if ($@) {
+            nprint("+ Warning: Failed to parse CVSS result: $@", "v");
+        }
+    }
+    
+    return undef;
+}
+
+# Modified add_vulnerability function
+sub add_vulnerability {
+    my ($mark, $message, $nikto_id, $refs, $method, $uri, $request, $response, $reason) = @_;
+    $uri    = "/"   unless (defined $uri);
+    $method = "GET" unless (defined $method);
+    if ($message !~ /\.$/) {
+        $message .= ".";
+    }
+
+    # check to see if we've alerted already (can be from content search, etc.)
+    foreach my $r (@RESULTS) {
+        if (   ($uri eq $r->{'uri'})
+            && ($message eq $r->{'message'})
+            && ($method eq $r->{'method'})
+            && (${ $r->{'mark'} }{'ident'} eq $mark->{'ident'})
+            && (${ $r->{'mark'} }{'port'} eq $mark->{'port'})) {
+            return;
+        }
+    }
+
+    my $result = "";
+    if (defined $_[7]) {
+        $result = $_[7]->{'whisker'}->{'data'};
+    }
+
+    my $resulthash;
+    %$resulthash = (mark     => $mark,
+                    message  => $message,
+                    nikto_id => $nikto_id,
+                    refs     => $refs,
+                    method   => $method,
+                    uri      => $response->{whisker}->{uri_requested} || '/',
+                    result   => $result,
+                    request  => $request,
+                    response => $response,
+                    reason   => $reason,
+                    );
+
+    # *** CVSS INTEGRATION POINT ***
+    # Add CVSS information to the vulnerability
+    add_cvss_to_vulnerability($mark, $resulthash, $message);
+
+    push(@RESULTS, $resulthash);
+    $mark->{total_vulns}++;
+
+    if ($refs ne "") {
+        $message .= " See: $refs";
+    }
+
+    nprint("+ $message", "", ($mark->{'hostname'}, $mark->{'ip'}, $mark->{'displayname'}));
+
+    # Save it
+    if ($CLI{'saveresults'} ne '') {
+        save_item($resulthash, $message, $request, $response);
+    }
+
+    # Now report it
+    report_item($mark, $resulthash);
+}
+
+# Plugin must return true value
+1;
+

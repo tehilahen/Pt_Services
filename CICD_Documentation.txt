@@ -1,0 +1,288 @@
+================================================================================
+                    PT Service - CI/CD Documentation
+                    סיכום מפורט של תהליך ה-CI/CD
+================================================================================
+
+================================================================================
+1. PROJECT ARCHITECTURE - ארכיטקטורת הפרויקט
+================================================================================
+
+PT_Service/
+├── PT_Service_Backend/      # Python Flask API (port 5000)
+│   ├── Dockerfile
+│   └── azure-pipelines.yml
+│
+├── PT_Service_fronend/      # React Frontend (port 3000)
+│   ├── dockerfile
+│   └── azure-pipelines.yml
+│
+├── nginx.conf               # Reverse Proxy (ports 80/443)
+├── docker-compose.yml       # Production orchestration
+└── cert_files/              # SSL certificates
+
+================================================================================
+2. CI PROCESS - תהליך ה-Continuous Integration
+================================================================================
+
+TRIGGER (הפעלה):
+-----------------
+- כל push ל-branch "master" מפעיל את ה-pipeline
+- רץ על pool בשם "AWS" (self-hosted agent)
+
+trigger:
+  branches:
+    include:
+      - master
+
+pool:
+  name: 'AWS'
+
+--------------------------------------------------------------------------------
+
+STEP 1: Docker Build (בניית Images)
+------------------------------------
+
+Backend:
+  docker build \
+    --build-arg HTTP_PROXY=http://192.168.174.80:8080 \
+    --build-arg HTTPS_PROXY=http://192.168.174.80:8080 \
+    -t 684610983594.dkr.ecr.il-central-1.amazonaws.com/global-repo:PT_Service_backend .
+
+Frontend:
+  docker build \
+    --build-arg HTTP_PROXY=http://192.168.174.80:8080 \
+    --build-arg HTTPS_PROXY=http://192.168.174.80:8080 \
+    -t 684610983594.dkr.ecr.il-central-1.amazonaws.com/global-repo:PT_Service_frontend .
+
+--------------------------------------------------------------------------------
+
+STEP 2: Login to AWS ECR (התחברות ל-Registry)
+----------------------------------------------
+
+aws ecr get-login-password | docker login --username AWS --password-stdin $(molsa_ecr_repository)
+
+- משתמש ב-AWS credentials מ-Azure DevOps
+- Service Connection: iam-m-molsa-azuredevops-M-MOLSA-Shared-Services-Security_NiktoWebServerScanner
+- Region: il-central-1
+
+--------------------------------------------------------------------------------
+
+STEP 3: Docker Push (העלאת Images)
+-----------------------------------
+
+docker push 684610983594.dkr.ecr.il-central-1.amazonaws.com/global-repo:PT_Service_backend
+docker push 684610983594.dkr.ecr.il-central-1.amazonaws.com/global-repo:PT_Service_frontend
+
+--------------------------------------------------------------------------------
+
+STEP 4: Docker Logout (התנתקות)
+--------------------------------
+
+docker logout $(container_registry)
+
+================================================================================
+3. CD PROCESS - תהליך ה-Continuous Deployment
+================================================================================
+
+DEPLOYMENT (פריסה בשרת הפרודקשן):
+----------------------------------
+
+# 1. Pull latest images from ECR
+docker-compose pull
+
+# 2. Stop existing containers
+docker-compose down
+
+# 3. Start with new images
+docker-compose up -d
+
+# 4. Verify containers are running
+docker ps
+
+# 5. Check logs if needed
+docker-compose logs -f
+
+================================================================================
+4. DOCKER COMPOSE SERVICES
+================================================================================
+
+SERVICE: pt-service-backend
+---------------------------
+- Image: 684610983594.dkr.ecr.il-central-1.amazonaws.com/global-repo:PT_Service_backend
+- Port: 5000:5000
+- Environment:
+  - SQL_CONNECTION_STRING (Database connection)
+- Network: pt-service-network
+
+SERVICE: pt-service-frontend
+----------------------------
+- Image: 684610983594.dkr.ecr.il-central-1.amazonaws.com/global-repo:PT_Service_frontend
+- Port: 3000:3000
+- Depends on: pt-service-backend
+- Environment:
+  - HOST=0.0.0.0
+  - HTTP_PROXY, HTTPS_PROXY, NO_PROXY
+- Network: pt-service-network
+
+SERVICE: nginx-pt_service
+-------------------------
+- Build: Local Dockerfile
+- Ports: 80:80, 443:443
+- Depends on: pt-service-backend, pt-service-frontend
+- Volumes: ./cert_files:/etc/nginx/ssl
+- Network: pt-service-network
+
+================================================================================
+5. NGINX ROUTING - ניתוב בקשות
+================================================================================
+
+IMPORTANT: nginx.conf must include routing for both frontend AND backend!
+
+                    NGINX (port 443)
+                         │
+         ┌───────────────┴───────────────┐
+         │                               │
+    /api/*                            /*
+         │                               │
+         ▼                               ▼
+  pt-service-backend:5000    pt-service-frontend:3000
+
+
+Required nginx.conf locations:
+------------------------------
+
+location /api {
+    proxy_pass http://pt-service-backend:5000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto https;
+}
+
+location / {
+    proxy_pass http://pt-service-frontend:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto https;
+    
+    # WebSocket support
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+}
+
+================================================================================
+6. PIPELINE VARIABLES - משתנים ב-Azure DevOps
+================================================================================
+
+Variable                  | Value
+--------------------------|--------------------------------------------------
+molsa_ecr_repository      | 684610983594.dkr.ecr.il-central-1.amazonaws.com
+container_repository      | global-repo
+container_tag (backend)   | PT_Service_backend
+container_tag (frontend)  | PT_Service_frontend
+HTTP_PROXY                | http://192.168.174.80:8080
+HTTPS_PROXY               | http://192.168.174.80:8080
+
+================================================================================
+7. FLOW DIAGRAM - תרשים זרימה
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────┐
+│                         DEVELOPER                                │
+│                    (git push to master)                          │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    AZURE DEVOPS PIPELINE                         │
+│                                                                  │
+│   1. Docker Build (with proxy args)                              │
+│   2. AWS ECR Login                                               │
+│   3. Docker Push                                                 │
+│   4. Docker Logout                                               │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     AWS ECR (il-central-1)                       │
+│                                                                  │
+│   - global-repo:PT_Service_backend                               │
+│   - global-repo:PT_Service_frontend                              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   PRODUCTION SERVER                              │
+│                                                                  │
+│   docker-compose pull                                            │
+│   docker-compose up -d                                           │
+│                                                                  │
+│   ┌─────────────────────────────────────────────────────┐       │
+│   │                      NGINX                           │       │
+│   │                   (SSL/HTTPS)                        │       │
+│   │                                                      │       │
+│   │    /api/* ───► Backend (Flask:5000)                 │       │
+│   │    /*     ───► Frontend (React:3000)                │       │
+│   └─────────────────────────────────────────────────────┘       │
+└─────────────────────────────────────────────────────────────────┘
+
+================================================================================
+8. TROUBLESHOOTING - פתרון בעיות
+================================================================================
+
+PROBLEM: 503 Service Unavailable on /api/*
+SOLUTION: Add "location /api" block in nginx.conf
+
+PROBLEM: WebSocket connection failed
+SOLUTION: Add WebSocket headers in nginx location block
+
+PROBLEM: Container name not found
+SOLUTION: Use correct container names in nginx upstream:
+  - pt-service-backend (not PT_Service_backend)
+  - pt-service-frontend (not PT_Service_fronend)
+
+PROBLEM: SSL certificate errors
+SOLUTION: Check cert_files folder contains:
+  - molsa.pem
+  - pt-services.crt
+  - pt-services.key
+
+================================================================================
+9. USEFUL COMMANDS - פקודות שימושיות
+================================================================================
+
+# View running containers
+docker ps
+
+# View all containers (including stopped)
+docker ps -a
+
+# View logs
+docker-compose logs -f
+docker logs pt-service-backend
+docker logs pt-service-frontend
+docker logs nginx-pt_service
+
+# Restart services
+docker-compose restart
+
+# Rebuild and restart
+docker-compose down
+docker-compose up -d --build
+
+# Enter container shell
+docker exec -it pt-service-backend /bin/bash
+docker exec -it pt-service-frontend /bin/sh
+
+# Check nginx config
+docker exec nginx-pt_service nginx -t
+
+# Reload nginx without restart
+docker exec nginx-pt_service nginx -s reload
+
+================================================================================
+                           END OF DOCUMENT
+================================================================================
+

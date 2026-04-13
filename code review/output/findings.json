@@ -1,0 +1,803 @@
+[
+  {
+    "finding_code": "SEC-001",
+    "title": "Debug Mode Enabled in Production",
+    "description": "Found in Dockerfile at line 39: Debug Mode Enabled in Production",
+    "severity": "Medium",
+    "probability": "High",
+    "risk": "High",
+    "file_path": "Dockerfile",
+    "line_number": 39,
+    "code_snippet": "    FLASK_PORT=5000 \\\n    FLASK_DEBUG=True \\\n    WATCH_FOLDER=\"nikto output\" \\\n    ARCHIVE_FOLDER=archive",
+    "recommendation": "Disable debug mode in production. Use environment variables to control debug settings.",
+    "tags": [
+      "configuration",
+      "debug",
+      "owasp-a5"
+    ]
+  },
+  {
+    "finding_code": "SEC-002",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 165: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 165,
+    "code_snippet": "            })\n            response.headers.add('Access-Control-Allow-Origin', '*')\n            return response, 400\n        ",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-003",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 178: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 178,
+    "code_snippet": "            })\n            response.headers.add('Access-Control-Allow-Origin', '*')\n            return response, 400\n        ",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-004",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 189: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 189,
+    "code_snippet": "            })\n            response.headers.add('Access-Control-Allow-Origin', '*')\n            return response, 404\n        ",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-005",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 199: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 199,
+    "code_snippet": "            })\n            response.headers.add('Access-Control-Allow-Origin', '*')\n            return response, 400\n        ",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-006",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 240: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 240,
+    "code_snippet": "            })\n            response.headers.add('Access-Control-Allow-Origin', '*')\n            return response, 503  # Service Unavailable\n        ",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-007",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 262: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 262,
+    "code_snippet": "            })\n            response.headers.add('Access-Control-Allow-Origin', '*')\n            return response, 500\n        ",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-008",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 281: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 281,
+    "code_snippet": "        })\n        response.headers.add('Access-Control-Allow-Origin', '*')\n        return response, 200\n        ",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-009",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 291: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 291,
+    "code_snippet": "        })\n        response.headers.add('Access-Control-Allow-Origin', '*')\n        return response, 500\n",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-010",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 341: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 341,
+    "code_snippet": "            })\n            response.headers.add('Access-Control-Allow-Origin', '*')\n            return response, 404\n        ",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-011",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 364: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 364,
+    "code_snippet": "        response = jsonify(response_data)\n        response.headers.add('Access-Control-Allow-Origin', '*')\n        return response, 200\n        ",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-012",
+    "title": "CORS Wildcard or Overly Permissive",
+    "description": "Found in src/api_server.py at line 374: CORS Wildcard or Overly Permissive",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 374,
+    "code_snippet": "        })\n        response.headers.add('Access-Control-Allow-Origin', '*')\n        return response, 500\n",
+    "recommendation": "Restrict CORS to specific trusted origins instead of using wildcard (*).",
+    "tags": [
+      "cors",
+      "owasp-a5",
+      "configuration"
+    ]
+  },
+  {
+    "finding_code": "SEC-013",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/api_server.py at line 1431: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 1431,
+    "code_snippet": "        logger.error(f\"שגיאה בשליפת מעקב PT: {str(e)}\")\n        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500\n\n",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-014",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/api_server.py at line 1463: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 1463,
+    "code_snippet": "        logger.error(f\"שגיאה ביצירת מעקב PT: {str(e)}\")\n        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500\n\n",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-015",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/api_server.py at line 1522: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 1522,
+    "code_snippet": "        logger.error(f\"שגיאה בשליחת תזכורות PT: {str(e)}\")\n        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500\n\n",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-016",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/api_server.py at line 1538: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 1538,
+    "code_snippet": "        logger.error(f\"שגיאה בשליפת מעקב PT: {str(e)}\")\n        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500\n\n",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-017",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/api_server.py at line 1569: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 1569,
+    "code_snippet": "        logger.error(f\"שגיאה בעדכון מעקב PT: {str(e)}\")\n        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500\n\n",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-018",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/api_server.py at line 1585: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 1585,
+    "code_snippet": "        logger.error(f\"שגיאה במחיקת מעקב PT: {str(e)}\")\n        return jsonify({'success': False, 'message': 'שגיאה פנימית בשרת', 'error': str(e)}), 500\n\n# רישום כפול של pt-tracking בלי קידומת /api (תאימות לפרוקסי שמקצץ את /api)",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-019",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/api_server.py at line 1689: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 1689,
+    "code_snippet": "    except ValueError as e:\n        return jsonify({'success': False, 'message': str(e)}), 400\n    except Exception as e:\n        logger.error(f\"שגיאה בהפעלת סריקת קוד: {str(e)}\")",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-020",
+    "title": "Authentication Endpoint Without Rate Limiting",
+    "description": "Found in src/api_server.py at line 119: Authentication Endpoint Without Rate Limiting",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/api_server.py",
+    "line_number": 119,
+    "code_snippet": "\n@app.route('/', methods=['GET'])\ndef health_check():\n    \"\"\"בדיקת תקינות השרת\"\"\"",
+    "recommendation": "Add rate limiting to authentication endpoints to prevent brute force attacks.",
+    "tags": [
+      "brute-force",
+      "rate-limiting",
+      "owasp-a7"
+    ]
+  },
+  {
+    "finding_code": "SEC-021",
+    "title": "SSL Certificate Verification Disabled",
+    "description": "Found in src/availability_checker.py at line 95: SSL Certificate Verification Disabled",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/availability_checker.py",
+    "line_number": 95,
+    "code_snippet": "                    allow_redirects=True,\n                    verify=False  # לא מאמת SSL certificates (לצורכי בדיקה)\n                )\n            except requests.exceptions.RequestException:",
+    "recommendation": "Always verify SSL certificates. Disabling verification allows MITM attacks.",
+    "tags": [
+      "ssl",
+      "tls",
+      "owasp-a2"
+    ]
+  },
+  {
+    "finding_code": "SEC-022",
+    "title": "SSL Certificate Verification Disabled",
+    "description": "Found in src/availability_checker.py at line 104: SSL Certificate Verification Disabled",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/availability_checker.py",
+    "line_number": 104,
+    "code_snippet": "                    allow_redirects=True,\n                    verify=False,\n                    stream=True  # לא מוריד את כל התוכן\n                )",
+    "recommendation": "Always verify SSL certificates. Disabling verification allows MITM attacks.",
+    "tags": [
+      "ssl",
+      "tls",
+      "owasp-a2"
+    ]
+  },
+  {
+    "finding_code": "SEC-023",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/csv_parser.py at line 67: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/csv_parser.py",
+    "line_number": 67,
+    "code_snippet": "                    # בדיקה אם זה קובץ CVSS החדש (מתחיל בשורת כותרת מיוחדת)\n                    with open(file_path, 'r', encoding=encoding) as f:\n                        first_line = f.readline().strip()\n                        if 'Nikto - v2.5.0/ (with CVSS)' in first_line:",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-024",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/csv_parser.py at line 236: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/csv_parser.py",
+    "line_number": 236,
+    "code_snippet": "            import traceback\n            logger.error(f\"Traceback: {traceback.format_exc()}\")\n            return False\n    ",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-025",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/csv_parser.py at line 520: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/csv_parser.py",
+    "line_number": 520,
+    "code_snippet": "            import traceback\n            logger.error(f\"Traceback: {traceback.format_exc()}\")\n            return False\n    ",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-026",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/cvss_mapper.py at line 35: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/cvss_mapper.py",
+    "line_number": 35,
+    "code_snippet": "        if config_file is None:\n            config_file = os.path.join(os.path.dirname(__file__), 'cvss_mappings.json')\n        self.config_file = config_file\n        self.load_mappings()",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-027",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/cvss_mapper.py at line 283: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/cvss_mapper.py",
+    "line_number": 283,
+    "code_snippet": "        }\n        with open(filename, 'w') as f:\n            json.dump(config, f, indent=2)\n    ",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-028",
+    "title": "Potential SQL Injection",
+    "description": "Found in src/database.py at line 133: Potential SQL Injection",
+    "severity": "Critical",
+    "probability": "High",
+    "risk": "Critical",
+    "file_path": "src/database.py",
+    "line_number": 133,
+    "code_snippet": "                    raise ValueError(f\"שם מסד נתונים לא חוקי: {self.database}\")\n                cursor.execute(f\"CREATE DATABASE [{safe_db_name}]\")\n                self.connection.commit()\n            ",
+    "recommendation": "Use parameterized queries (? placeholders) instead of string formatting in SQL statements.",
+    "tags": [
+      "sql-injection",
+      "owasp-a3",
+      "injection"
+    ]
+  },
+  {
+    "finding_code": "SEC-029",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/database.py at line 1086: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/database.py",
+    "line_number": 1086,
+    "code_snippet": "            import traceback\n            logger.error(f\"Traceback: {traceback.format_exc()}\")\n            return None\n    ",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-030",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/database.py at line 1225: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/database.py",
+    "line_number": 1225,
+    "code_snippet": "            import traceback\n            logger.error(f\"Traceback: {traceback.format_exc()}\")\n            return None\n    ",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-031",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/database.py at line 1327: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/database.py",
+    "line_number": 1327,
+    "code_snippet": "            import traceback\n            logger.error(f\"Traceback: {traceback.format_exc()}\")\n            return None\n    ",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-032",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/database.py at line 1459: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/database.py",
+    "line_number": 1459,
+    "code_snippet": "            import traceback\n            logger.error(f\"Traceback: {traceback.format_exc()}\")\n            return None\n    ",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-033",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/database.py at line 1573: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/database.py",
+    "line_number": 1573,
+    "code_snippet": "            import traceback\n            logger.error(f\"Traceback: {traceback.format_exc()}\")\n            return None\n",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-034",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/email_service.py at line 24: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/email_service.py",
+    "line_number": 24,
+    "code_snippet": "# הגדרת Jinja2 לתבניות מייל\nTEMPLATES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates', 'email')\njinja_env = Environment(\n    loader=FileSystemLoader(TEMPLATES_DIR),",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-035",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/file_watcher.py at line 85: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/file_watcher.py",
+    "line_number": 85,
+    "code_snippet": "        try:\n            with open(file_path, 'r', encoding='utf-8') as f:\n                first_line = f.readline().strip()\n                second_line = f.readline().strip()",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-036",
+    "title": "Authentication Endpoint Without Rate Limiting",
+    "description": "Found in src/jwt_auth.py at line 110: Authentication Endpoint Without Rate Limiting",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "Medium",
+    "file_path": "src/jwt_auth.py",
+    "line_number": 110,
+    "code_snippet": "    שימוש:\n        @app.route('/api/protected')\n        @jwt_required\n        def protected_route(current_user):",
+    "recommendation": "Add rate limiting to authentication endpoints to prevent brute force attacks.",
+    "tags": [
+      "brute-force",
+      "rate-limiting",
+      "owasp-a7"
+    ]
+  },
+  {
+    "finding_code": "SEC-037",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/nikto_executor.py at line 80: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/nikto_executor.py",
+    "line_number": 80,
+    "code_snippet": "            has_cvss = False\n            with open(csv_file_path, 'r', encoding='utf-8', newline='') as f:\n                first_line = f.readline()\n                if '(with CVSS)' in first_line:",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-038",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/nikto_executor.py at line 87: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/nikto_executor.py",
+    "line_number": 87,
+    "code_snippet": "            # קריאת הקובץ המקורי וכתיבת הקובץ החדש\n            with open(csv_file_path, 'r', encoding='utf-8', newline='') as infile:\n                with open(temp_file, 'w', encoding='utf-8', newline='') as outfile:\n                    # קריאת השורה הראשונה (header של Nikto) - נדלג עליה",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-039",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/nikto_executor.py at line 167: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/nikto_executor.py",
+    "line_number": 167,
+    "code_snippet": "            # קריאת הקובץ המקורי וכתיבת הקובץ החדש\n            with open(csv_file_path, 'r', encoding='utf-8', newline='') as infile:\n                with open(temp_file, 'w', encoding='utf-8', newline='') as outfile:\n                    # קריאת header עם SystemID (אין יותר header של Nikto אחרי _add_system_id_to_csv)",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-040",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/nikto_executor.py at line 293: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/nikto_executor.py",
+    "line_number": 293,
+    "code_snippet": "            # החזרת נתיב מלא (absolute path)\n            filepath = os.path.join(output_dir, filename)\n            # Ensure absolute path\n            filepath = os.path.abspath(filepath)",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-041",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/nikto_executor.py at line 303: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/nikto_executor.py",
+    "line_number": 303,
+    "code_snippet": "            filename = f\"{now.strftime('%d%m%Y-%H%M')}-system-{system_id}.csv\"\n            return os.path.join(output_dir, filename)\n    \n    def build_nikto_command(self, target_url, output_file):",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-042",
+    "title": "Detailed Error Information Exposed",
+    "description": "Found in src/nikto_executor.py at line 260: Detailed Error Information Exposed",
+    "severity": "Low",
+    "probability": "High",
+    "risk": "Medium",
+    "file_path": "src/nikto_executor.py",
+    "line_number": 260,
+    "code_snippet": "            import traceback\n            logger.error(f\"Traceback: {traceback.format_exc()}\")\n            # ניסיון למחוק קובץ זמני אם קיים\n            try:",
+    "recommendation": "Do not expose internal error details to users. Log the full error server-side and return generic error messages.",
+    "tags": [
+      "information-disclosure",
+      "owasp-a6"
+    ]
+  },
+  {
+    "finding_code": "SEC-043",
+    "title": "SSL Certificate Verification Disabled",
+    "description": "Found in src/nvd_api_client.py at line 52: SSL Certificate Verification Disabled",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/nvd_api_client.py",
+    "line_number": 52,
+    "code_snippet": "        # Make API request\n        # Note: verify=False is used here for compatibility, but should be True in production\n        response = requests.get(url, headers=headers, timeout=timeout, verify=False)\n        ",
+    "recommendation": "Always verify SSL certificates. Disabling verification allows MITM attacks.",
+    "tags": [
+      "ssl",
+      "tls",
+      "owasp-a2"
+    ]
+  },
+  {
+    "finding_code": "SEC-044",
+    "title": "SSL Certificate Verification Disabled",
+    "description": "Found in src/nvd_api_client.py at line 53: SSL Certificate Verification Disabled",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/nvd_api_client.py",
+    "line_number": 53,
+    "code_snippet": "        # Note: verify=False is used here for compatibility, but should be True in production\n        response = requests.get(url, headers=headers, timeout=timeout, verify=False)\n        \n        if response.status_code == 200:",
+    "recommendation": "Always verify SSL certificates. Disabling verification allows MITM attacks.",
+    "tags": [
+      "ssl",
+      "tls",
+      "owasp-a2"
+    ]
+  },
+  {
+    "finding_code": "SEC-045",
+    "title": "Potential Path Traversal",
+    "description": "Found in src/stitch/stitch_executor.py at line 93: Potential Path Traversal",
+    "severity": "High",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/stitch/stitch_executor.py",
+    "line_number": 93,
+    "code_snippet": "        try:\n            with open(script_path, 'r', encoding='utf-8') as f:\n                lines = f.readlines()\n                ",
+    "recommendation": "Validate and sanitize file paths. Use os.path.basename to strip directory components from user input.",
+    "tags": [
+      "path-traversal",
+      "owasp-a1",
+      "lfi"
+    ]
+  },
+  {
+    "finding_code": "SEC-046",
+    "title": "SSL Certificate Verification Disabled",
+    "description": "Found in src/stitch/scripts/example_scan.py at line 42: SSL Certificate Verification Disabled",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/stitch/scripts/example_scan.py",
+    "line_number": 42,
+    "code_snippet": "    try:\n        response = requests.get(url, timeout=timeout, verify=False)\n        \n        # Headers חשובים לאבטחה",
+    "recommendation": "Always verify SSL certificates. Disabling verification allows MITM attacks.",
+    "tags": [
+      "ssl",
+      "tls",
+      "owasp-a2"
+    ]
+  },
+  {
+    "finding_code": "SEC-047",
+    "title": "SSL Certificate Verification Disabled",
+    "description": "Found in src/stitch/scripts/example_scan.py at line 159: SSL Certificate Verification Disabled",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/stitch/scripts/example_scan.py",
+    "line_number": 159,
+    "code_snippet": "    try:\n        response = requests.get(url, timeout=timeout, verify=False)\n        \n        for cookie in response.cookies:",
+    "recommendation": "Always verify SSL certificates. Disabling verification allows MITM attacks.",
+    "tags": [
+      "ssl",
+      "tls",
+      "owasp-a2"
+    ]
+  },
+  {
+    "finding_code": "SEC-048",
+    "title": "SSL Certificate Verification Disabled",
+    "description": "Found in src/stitch/scripts/example_scan.py at line 202: SSL Certificate Verification Disabled",
+    "severity": "Medium",
+    "probability": "Medium",
+    "risk": "High",
+    "file_path": "src/stitch/scripts/example_scan.py",
+    "line_number": 202,
+    "code_snippet": "    try:\n        response = requests.get(url, timeout=timeout, verify=False)\n        content = response.text.lower()\n        ",
+    "recommendation": "Always verify SSL certificates. Disabling verification allows MITM attacks.",
+    "tags": [
+      "ssl",
+      "tls",
+      "owasp-a2"
+    ]
+  }
+]
