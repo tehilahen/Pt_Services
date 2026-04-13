@@ -6,12 +6,14 @@ services:
     expose:
       - "5000"  # Internal only - not exposed externally
     environment:
-      - SQL_CONNECTION_STRING=Driver={ODBC Driver 17 for SQL Server};Server=SQLDEV.molsa.gov.il;Database=SA_DTI_Security_NiktoWebServerScanner;UID=ptuser;PWD=ptuser1993!;TrustServerCertificate=yes;
+      # מסד מקומי לדמו (SQLite) — הגדר ב-.env: SQLITE_DB_PATH
+      - SQLITE_DB_PATH=${SQLITE_DB_PATH:-/data/demo.sqlite}
       - TFS_PAT=${TFS_PAT}
       - TFS_BASE_URL=${TFS_BASE_URL}
       - CODE_REVIEWER_IMAGE=code-reviewer:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Docker socket for code review orchestrator
+      - pt_sqlite_data:/data
     networks:
       - pt-service-network
     restart: unless-stopped
@@ -48,6 +50,9 @@ services:
     networks:
       - pt-service-network
     restart: unless-stopped
+
+volumes:
+  pt_sqlite_data:
 
 networks:
   pt-service-network:
