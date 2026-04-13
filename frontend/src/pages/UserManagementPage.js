@@ -49,6 +49,13 @@ import {
   Restore as RestoreIcon
 } from '@mui/icons-material';
 import axios from 'axios';
+import { APP_BORDER_BLUE, APP_BORDER_BLUE_SOFT } from '../themeTokens';
+import {
+  tableContainerPaperSx,
+  tableHeadCellSx,
+  tableBodyRowSx,
+  tableScrollbarSx
+} from '../tableStyles';
 
 function UserManagementPage({ user }) {
   // State
@@ -143,8 +150,8 @@ function UserManagementPage({ user }) {
     const typeId = parseInt(userTypeId);
     switch (typeId) {
       case 1: return { bg: 'rgba(170, 10, 33, 0.15)', color: '#aa0a21', label: 'Admin' };
-      case 2: return { bg: 'rgba(85, 198, 194, 0.15)', color: '#55c6c2', label: 'System Manager' };
-      case 3: return { bg: 'rgba(52, 152, 219, 0.15)', color: '#3498db', label: 'Super Manager' };
+      case 2: return { bg: 'rgba(168, 85, 247, 0.15)', color: '#A855F7', label: 'System Manager' };
+      case 3: return { bg: 'rgba(168, 85, 247, 0.15)', color: '#A855F7', label: 'Super Manager' };
       default: return { bg: 'rgba(128, 128, 128, 0.15)', color: '#808080', label: 'לא מוגדר' };
     }
   };
@@ -399,7 +406,7 @@ function UserManagementPage({ user }) {
         flexDirection: 'column',
         gap: 2
       }}>
-        <CircularProgress size={60} sx={{ color: '#3498db' }} />
+        <CircularProgress size={60} sx={{ color: '#A855F7' }} />
         <Typography variant="body1" color="text.secondary">
           טוען נתונים...
         </Typography>
@@ -410,7 +417,7 @@ function UserManagementPage({ user }) {
   return (
     <Box sx={{ 
       height: 'fit-content',
-      background: '#f8f9fa',
+      background: '#ffffff',
       py: 3
     }}>
       <Container maxWidth="xl">
@@ -429,7 +436,7 @@ function UserManagementPage({ user }) {
                 gap: 2
               }}
             >
-              <AdminIcon sx={{ fontSize: 40, color: '#3498db' }} />
+              <AdminIcon sx={{ fontSize: 40, color: '#A855F7' }} />
               ניהול משתמשים
             </Typography>
             <Typography variant="body1" sx={{ color: '#7f8c8d' }}>
@@ -462,7 +469,7 @@ function UserManagementPage({ user }) {
               p: 2, 
               mb: 3, 
               borderRadius: 3,
-              border: '1px solid rgba(52, 152, 219, 0.2)',
+              border: '1px solid rgba(168, 85, 247, 0.2)',
               backgroundColor: 'rgba(255, 255, 255, 0.9)'
             }}
           >
@@ -519,12 +526,12 @@ function UserManagementPage({ user }) {
                     borderRadius: 2,
                     px: 3,
                     py: 1.2,
-                    background: 'linear-gradient(135deg, #3498db 0%, #55c6c2 100%)',
+                    background: 'linear-gradient(135deg, #A855F7 0%, #A855F7 100%)',
                     fontWeight: 600,
-                    boxShadow: '0 4px 12px rgba(52, 152, 219, 0.3)',
+                    boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
                     '&:hover': {
-                      background: 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)',
-                      boxShadow: '0 6px 16px rgba(52, 152, 219, 0.4)'
+                      background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)',
+                      boxShadow: '0 6px 16px rgba(168, 85, 247, 0.4)'
                     }
                   }}
                 >
@@ -541,41 +548,22 @@ function UserManagementPage({ user }) {
             component={Paper} 
             elevation={0}
             sx={{ 
-              background: '#ffffff',
-              border: '1px solid #e0e0e0',
-              borderRadius: '16px',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+              ...tableContainerPaperSx,
+              ...tableScrollbarSx,
               maxHeight: 600,
-              overflow: 'auto',
-              '&::-webkit-scrollbar': {
-                width: '8px',
-                height: '8px'
-              },
-              '&::-webkit-scrollbar-track': {
-                backgroundColor: 'rgba(52, 152, 219, 0.05)',
-                borderRadius: '4px'
-              },
-              '&::-webkit-scrollbar-thumb': {
-                backgroundColor: 'rgba(52, 152, 219, 0.3)',
-                borderRadius: '4px',
-                '&:hover': {
-                  backgroundColor: 'rgba(52, 152, 219, 0.5)'
-                }
-              },
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(52, 152, 219, 0.3) rgba(52, 152, 219, 0.05)'
+              overflow: 'auto'
             }}
           >
-            <Table>
+            <Table sx={{ direction: 'rtl' }}>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>שם משתמש</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>שם מלא</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>אימייל</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>הרשאה</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>סטטוס</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>התחברות אחרונה</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2, textAlign: 'center' }}>פעולות</TableCell>
+                  <TableCell sx={tableHeadCellSx}>שם משתמש</TableCell>
+                  <TableCell sx={tableHeadCellSx}>שם מלא</TableCell>
+                  <TableCell sx={tableHeadCellSx}>אימייל</TableCell>
+                  <TableCell sx={tableHeadCellSx}>הרשאה</TableCell>
+                  <TableCell sx={tableHeadCellSx}>סטטוס</TableCell>
+                  <TableCell sx={tableHeadCellSx}>התחברות אחרונה</TableCell>
+                  <TableCell sx={{ ...tableHeadCellSx, textAlign: 'center' }}>פעולות</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -594,16 +582,13 @@ function UserManagementPage({ user }) {
                       <TableRow 
                         key={u.id}
                         sx={{ 
-                          backgroundColor: '#ffffff',
-                          '&:hover': { backgroundColor: '#f5f8ff' },
-                          borderBottom: '1px solid #f0f0f0',
-                          transition: 'background-color 0.2s ease',
+                          ...tableBodyRowSx,
                           opacity: u.is_active ? 1 : 0.6
                         }}
                       >
                         <TableCell sx={{ py: 2 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <PersonIcon sx={{ color: '#3498db', fontSize: 20 }} />
+                            <PersonIcon sx={{ color: '#A855F7', fontSize: 20 }} />
                             <Typography fontWeight={600} sx={{ color: '#1a252f' }}>{u.username}</Typography>
                           </Box>
                         </TableCell>
@@ -659,7 +644,7 @@ function UserManagementPage({ user }) {
                               <IconButton
                                 size="small"
                                 onClick={() => handleEditUser(u)}
-                                sx={{ color: '#3498db' }}
+                                sx={{ color: '#A855F7' }}
                               >
                                 <EditIcon fontSize="small" />
                               </IconButton>
@@ -671,7 +656,7 @@ function UserManagementPage({ user }) {
                                 <IconButton
                                   size="small"
                                   onClick={() => handleOpenSystemsDialog(u)}
-                                  sx={{ color: '#55c6c2' }}
+                                  sx={{ color: '#A855F7' }}
                                 >
                                   <ComputerIcon fontSize="small" />
                                 </IconButton>
@@ -728,7 +713,7 @@ function UserManagementPage({ user }) {
           <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'center' }}>
             <Chip
               label={`סה"כ: ${users.length} משתמשים`}
-              sx={{ backgroundColor: 'rgba(52, 152, 219, 0.1)', color: '#3498db', fontWeight: 600 }}
+              sx={{ backgroundColor: 'rgba(168, 85, 247, 0.1)', color: '#A855F7', fontWeight: 600 }}
             />
             <Chip
               label={`פעילים: ${users.filter(u => u.is_active).length}`}
@@ -751,17 +736,17 @@ function UserManagementPage({ user }) {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            border: '1px solid rgba(52, 152, 219, 0.3)'
+            border: '1px solid rgba(168, 85, 247, 0.3)'
           }
         }}
       >
         <DialogTitle sx={{ 
-          borderBottom: '1px solid rgba(0,0,0,0.1)',
+          borderBottom: `1px solid ${APP_BORDER_BLUE_SOFT}`,
           display: 'flex',
           alignItems: 'center',
           gap: 1
         }}>
-          <PersonIcon sx={{ color: '#3498db' }} />
+          <PersonIcon sx={{ color: '#A855F7' }} />
           {isEditing ? 'עריכת משתמש' : 'הוספת משתמש חדש'}
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
@@ -844,7 +829,7 @@ function UserManagementPage({ user }) {
             </Alert>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(0,0,0,0.1)' }}>
+        <DialogActions sx={{ p: 2, borderTop: `1px solid ${APP_BORDER_BLUE_SOFT}` }}>
           <Button 
             onClick={() => setOpenUserDialog(false)}
             sx={{ borderRadius: 2 }}
@@ -856,9 +841,9 @@ function UserManagementPage({ user }) {
             onClick={handleSaveUser}
             sx={{
               borderRadius: 2,
-              background: 'linear-gradient(135deg, #3498db 0%, #55c6c2 100%)',
+              background: 'linear-gradient(135deg, #A855F7 0%, #A855F7 100%)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #2980b9 0%, #3498db 100%)'
+                background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)'
               }
             }}
           >
@@ -876,12 +861,12 @@ function UserManagementPage({ user }) {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            border: '1px solid rgba(52, 152, 219, 0.3)'
+            border: '1px solid rgba(168, 85, 247, 0.3)'
           }
         }}
       >
         <DialogTitle sx={{ 
-          borderBottom: '1px solid rgba(0,0,0,0.1)',
+          borderBottom: `1px solid ${APP_BORDER_BLUE_SOFT}`,
           display: 'flex',
           alignItems: 'center',
           gap: 1
@@ -912,7 +897,7 @@ function UserManagementPage({ user }) {
             שים לב: המשתמש יצטרך להשתמש בסיסמה החדשה בהתחברות הבאה.
           </Alert>
         </DialogContent>
-        <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(0,0,0,0.1)' }}>
+        <DialogActions sx={{ p: 2, borderTop: `1px solid ${APP_BORDER_BLUE_SOFT}` }}>
           <Button 
             onClick={() => setOpenPasswordDialog(false)}
             sx={{ borderRadius: 2 }}
@@ -944,17 +929,17 @@ function UserManagementPage({ user }) {
         PaperProps={{
           sx: {
             borderRadius: 3,
-            border: '1px solid rgba(52, 152, 219, 0.3)'
+            border: '1px solid rgba(168, 85, 247, 0.3)'
           }
         }}
       >
         <DialogTitle sx={{ 
-          borderBottom: '1px solid rgba(0,0,0,0.1)',
+          borderBottom: `1px solid ${APP_BORDER_BLUE_SOFT}`,
           display: 'flex',
           alignItems: 'center',
           gap: 1
         }}>
-          <ComputerIcon sx={{ color: '#55c6c2' }} />
+          <ComputerIcon sx={{ color: '#A855F7' }} />
           ניהול מערכות - {selectedUser?.username}
         </DialogTitle>
         <DialogContent sx={{ pt: 3 }}>
@@ -995,7 +980,7 @@ function UserManagementPage({ user }) {
           <Box sx={{ 
             maxHeight: 350, 
             overflowY: 'auto',
-            border: '1px solid rgba(0,0,0,0.1)',
+            border: `1px solid ${APP_BORDER_BLUE}`,
             borderRadius: 2,
             p: 2
           }}>
@@ -1019,8 +1004,8 @@ function UserManagementPage({ user }) {
                       }
                     }}
                     sx={{ 
-                      color: '#55c6c2',
-                      '&.Mui-checked': { color: '#55c6c2' }
+                      color: '#A855F7',
+                      '&.Mui-checked': { color: '#A855F7' }
                     }}
                   />
                 }
@@ -1036,7 +1021,7 @@ function UserManagementPage({ user }) {
                   width: '100%', 
                   m: 0, 
                   py: 1,
-                  borderBottom: '1px solid rgba(0,0,0,0.05)',
+                  borderBottom: `1px solid ${APP_BORDER_BLUE_SOFT}`,
                   '&:last-child': { borderBottom: 'none' }
                 }}
               />
@@ -1056,11 +1041,11 @@ function UserManagementPage({ user }) {
             <Chip
               label={`נבחרו: ${selectedSystems.length} מערכות`}
               size="small"
-              sx={{ backgroundColor: 'rgba(85, 198, 194, 0.15)', color: '#55c6c2' }}
+              sx={{ backgroundColor: 'rgba(168, 85, 247, 0.15)', color: '#A855F7' }}
             />
           </Box>
         </DialogContent>
-        <DialogActions sx={{ p: 2, borderTop: '1px solid rgba(0,0,0,0.1)' }}>
+        <DialogActions sx={{ p: 2, borderTop: `1px solid ${APP_BORDER_BLUE_SOFT}` }}>
           <Button 
             onClick={() => setOpenSystemsDialog(false)}
             sx={{ borderRadius: 2 }}
@@ -1072,9 +1057,9 @@ function UserManagementPage({ user }) {
             onClick={handleSaveSystems}
             sx={{
               borderRadius: 2,
-              background: 'linear-gradient(135deg, #55c6c2 0%, #3498db 100%)',
+              background: 'linear-gradient(135deg, #A855F7 0%, #A855F7 100%)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)'
+                background: 'linear-gradient(135deg, #A855F7 0%, #7C3AED 100%)'
               }
             }}
           >

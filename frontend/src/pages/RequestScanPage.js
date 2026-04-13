@@ -145,31 +145,8 @@ function RequestScanPage() {
       height: 'fit-content',
       display: 'flex',
       flexDirection: 'column',
-      background: '#f8f9fa',
-      position: 'relative',
+      background: '#ffffff',
       direction: 'rtl',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(52, 152, 219, 0.03)',
-        pointerEvents: 'none',
-        zIndex: 0
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(138, 43, 226, 0.02)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }
     }}>
       <Container maxWidth="md" sx={{ py: 4, position: 'relative', zIndex: 1 }}>
         <Typography variant="h4" component="h1" sx={{
@@ -182,7 +159,7 @@ function RequestScanPage() {
           בקשה לבדיקת מערכת
         </Typography>
 
-        <Paper sx={{ p: 3, background: 'rgba(255, 255, 255, 0.9)', border: '1px solid rgba(52, 152, 219, 0.3)', borderRadius: 2, boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08)' }}>
+        <Paper sx={{ p: 3, background: 'rgba(255, 255, 255, 0.9)', border: '1px solid rgba(168, 85, 247, 0.3)', borderRadius: 2, boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08)' }}>
           {error && (
             <Alert severity="warning" sx={{ mb: 2, direction: 'rtl', textAlign: 'right' }}>{error}</Alert>
           )}

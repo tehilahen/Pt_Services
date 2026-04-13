@@ -198,7 +198,7 @@ function AllSystemsPage({ user }) {
       <Container maxWidth="xl" sx={{ py: 4, textAlign: 'center' }}>
         <CircularProgress size={60} 
         sx={{
-          color: '#3498DB',
+          color: '#A855F7',
           '& .MuiCircularProgress-circle': {
             strokeLinecap: 'round',
           }
@@ -227,30 +227,7 @@ function AllSystemsPage({ user }) {
       height: 'fit-content',
       display: 'flex',
       flexDirection: 'column',
-      background: '#f8f9fa',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(52, 152, 219, 0.03)',
-        pointerEvents: 'none',
-        zIndex: 0
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(138, 43, 226, 0.02)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }
+      background: '#ffffff',
     }}>
       <Container maxWidth="xl" sx={{ py: 4, position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
       <Fade in timeout={600}>
@@ -284,15 +261,15 @@ function AllSystemsPage({ user }) {
                     borderRadius: 3,
                     bgcolor: 'rgba(255, 255, 255, 0.9)',
                     backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(52, 152, 219, 0.3)',
+                    border: '1px solid rgba(168, 85, 247, 0.3)',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                     '&:hover': {
-                      border: '1px solid #3498DB',
-                      boxShadow: '0 6px 12px -2px rgba(52, 152, 219, 0.2)',
+                      border: '1px solid #A855F7',
+                      boxShadow: '0 6px 12px -2px rgba(168, 85, 247, 0.2)',
                     },
                     '&.Mui-focused': {
-                      border: '2px solid #3498DB',
-                      boxShadow: '0 0 0 3px rgba(52, 152, 219, 0.1)',
+                      border: '2px solid #A855F7',
+                      boxShadow: '0 0 0 3px rgba(168, 85, 247, 0.1)',
                     },
                     '& .MuiOutlinedInput-input': {
                       color: '#2c3e50',
@@ -302,13 +279,13 @@ function AllSystemsPage({ user }) {
                       }
                     },
                     '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(52, 152, 219, 0.3)'
+                      borderColor: 'rgba(168, 85, 247, 0.3)'
                     },
                     '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#3498DB'
+                      borderColor: '#A855F7'
                     },
                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#3498DB'
+                      borderColor: '#A855F7'
                     }
                   }
                 }}
@@ -329,11 +306,11 @@ function AllSystemsPage({ user }) {
               p: 6, 
               textAlign: 'center',
               background: 'rgba(255, 255, 255, 0.9)',
-              border: '1px solid rgba(52, 152, 219, 0.2)',
+              border: '1px solid rgba(168, 85, 247, 0.2)',
               borderRadius: '12px',
               boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
             }}>
-              <ComputerIcon sx={{ fontSize: 60, color: '#55c6c2', mb: 2, opacity: 0.7 }} />
+              <ComputerIcon sx={{ fontSize: 60, color: '#A855F7', mb: 2, opacity: 0.7 }} />
               <Typography variant="h6" sx={{ color: '#2c3e50', fontWeight: 600 }}>
                 אין מערכות זמינות לתצוגה
               </Typography>
@@ -349,13 +326,13 @@ function AllSystemsPage({ user }) {
                       cursor: 'pointer',
                       backgroundColor: 'rgba(255, 255, 255, 0.85)',
                       borderRadius: '12px',
-                      border: '1px solid rgba(52, 152, 219, 0.3)',
+                      border: '1px solid rgba(168, 85, 247, 0.3)',
                       transition: 'all 0.2s ease',
                       textDecoration: 'none',
                       display: 'block',
                       height: '100%',
                       '&:hover': {
-                          borderColor: '#3498DB',
+                          borderColor: '#A855F7',
                           transform: 'translateY(-2px)',
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
                         }
@@ -373,7 +350,7 @@ function AllSystemsPage({ user }) {
                         width: 10, 
                         height: 10, 
                         borderRadius: '50%', 
-                        backgroundColor: '#3498DB',
+                        backgroundColor: '#A855F7',
                         mb: 1.5
                           }} />
                       <Typography variant="h6" component="div" sx={{ 
@@ -394,7 +371,7 @@ function AllSystemsPage({ user }) {
                         </Typography>
                       )}
                       <Typography variant="body2" sx={{ 
-                        color: '#55c6c2',
+                        color: '#A855F7',
                         fontSize: '0.8rem',
                         mt: 'auto',
                         lineHeight: 1.4
@@ -443,7 +420,7 @@ function AllSystemsPage({ user }) {
                               onClick={(e) => handleStartCodeReview(e, system.id, system.name)}
                               disabled={reviewingSystemId === system.id || !system.repo_url || !canScanSystem(system)}
                               sx={{
-                                backgroundColor: (canScanSystem(system) && system.repo_url) ? '#2563eb' : '#bdc3c7',
+                                backgroundColor: (canScanSystem(system) && system.repo_url) ? '#A855F7' : '#bdc3c7',
                                 color: '#fff',
                                 borderRadius: 2,
                                 textTransform: 'none',
@@ -452,7 +429,7 @@ function AllSystemsPage({ user }) {
                                 px: 2,
                                 py: 0.5,
                                 '&:hover': (canScanSystem(system) && system.repo_url) ? {
-                                  backgroundColor: '#1d4ed8',
+                                  backgroundColor: '#7C3AED',
                                 } : {},
                                 '&:disabled': {
                                   backgroundColor: '#bdc3c7',

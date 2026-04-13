@@ -22,6 +22,15 @@ import {
   MenuItem,
   Collapse
 } from '@mui/material';
+import { APP_BORDER_BLUE } from '../themeTokens';
+import {
+  tableContainerPaperSx,
+  tableHeadCellSx,
+  tableHeadCellSortableSx,
+  tableNestedHeadCellSx,
+  tableBodyRowSx,
+  tableStickyRtlSx
+} from '../tableStyles';
 import {
   Code as CodeIcon,
   Visibility as ViewIcon,
@@ -89,8 +98,8 @@ function CodeReviewsPage({ user }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Succeeded': return '#55c6c2';
-      case 'Running': return '#3498DB';
+      case 'Succeeded': return '#16A34A';
+      case 'Running': return '#A855F7';
       case 'Queued': return '#f77f3c';
       case 'Failed': return '#aa0a21';
       default: return '#7f8c8d';
@@ -217,7 +226,7 @@ function CodeReviewsPage({ user }) {
           )}
           {review.low_count > 0 && (
             <Chip label={`${review.low_count} נמוך`} size="small"
-              sx={{ backgroundColor: '#eff6ff', color: '#2563eb', fontWeight: 600, fontSize: '0.7rem' }} />
+              sx={{ backgroundColor: '#e8f4fc', color: '#A855F7', fontWeight: 600, fontSize: '0.7rem' }} />
           )}
         </Box>
       );
@@ -231,30 +240,30 @@ function CodeReviewsPage({ user }) {
   if (loading && reviews.length === 0) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-        <CircularProgress sx={{ color: '#3498DB' }} />
+        <CircularProgress sx={{ color: '#A855F7' }} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ height: '100%', overflow: 'auto', p: 3 }}>
+    <Box sx={{ height: '100%', overflow: 'auto', p: 3, backgroundColor: '#ffffff' }}>
       <Container maxWidth="xl" sx={{ py: 2 }}>
         {/* Header */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <CodeIcon sx={{ fontSize: 32, color: '#3498DB' }} />
+            <CodeIcon sx={{ fontSize: 32, color: '#A855F7' }} />
             <Typography variant="h4" sx={{ fontWeight: 700, color: '#1a1a2e' }}>
               סריקות קוד
             </Typography>
             <Chip
               label={`${groupedSystems.length} מערכות`}
               size="small"
-              sx={{ backgroundColor: 'rgba(52, 152, 219, 0.15)', color: '#3498DB', fontWeight: 600 }}
+              sx={{ backgroundColor: 'rgba(168, 85, 247, 0.15)', color: '#A855F7', fontWeight: 600 }}
             />
             <Chip
               label={`${filteredReviews.length} סריקות`}
               size="small"
-              sx={{ backgroundColor: 'rgba(85, 198, 194, 0.15)', color: '#55c6c2', fontWeight: 600 }}
+              sx={{ backgroundColor: 'rgba(168, 85, 247, 0.15)', color: '#A855F7', fontWeight: 600 }}
             />
           </Box>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -272,7 +281,7 @@ function CodeReviewsPage({ user }) {
                 ))}
               </Select>
             </FormControl>
-            <IconButton onClick={fetchReviews} sx={{ color: '#3498DB' }}>
+            <IconButton onClick={fetchReviews} sx={{ color: '#A855F7' }}>
               <RefreshIcon />
             </IconButton>
           </Box>
@@ -283,17 +292,12 @@ function CodeReviewsPage({ user }) {
         )}
 
         {/* Table */}
-        <TableContainer component={Paper} sx={{
-          borderRadius: 3,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-          border: '1px solid #e2e8f0',
-          backgroundColor: 'white'
-        }}>
-          <Table>
+        <TableContainer component={Paper} sx={tableContainerPaperSx}>
+          <Table sx={tableStickyRtlSx}>
             <TableHead>
-              <TableRow sx={{ backgroundColor: '#f8fafc' }}>
-                <TableCell sx={{ fontWeight: 700, color: '#334155', borderBottom: '2px solid #e2e8f0', width: 50 }} />
-                <TableCell sx={{ fontWeight: 700, color: '#334155', cursor: 'pointer', borderBottom: '2px solid #e2e8f0' }}
+              <TableRow>
+                <TableCell sx={{ ...tableHeadCellSx, width: 50 }} />
+                <TableCell sx={tableHeadCellSortableSx}
                   onClick={handleSortByName}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <ComputerIcon sx={{ fontSize: 18 }} />
@@ -301,10 +305,10 @@ function CodeReviewsPage({ user }) {
                     {sortBy === 'name' && (sortDirection === 'asc' ? <ArrowUpIcon sx={{ fontSize: 16 }} /> : <ArrowDownIcon sx={{ fontSize: 16 }} />)}
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#334155', borderBottom: '2px solid #e2e8f0', textAlign: 'center' }}>
+                <TableCell sx={{ ...tableHeadCellSx, textAlign: 'center' }}>
                   כמות סריקות
                 </TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#334155', cursor: 'pointer', borderBottom: '2px solid #e2e8f0' }}
+                <TableCell sx={tableHeadCellSortableSx}
                   onClick={handleSortByDate}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <ScheduleIcon sx={{ fontSize: 18 }} />
@@ -312,8 +316,8 @@ function CodeReviewsPage({ user }) {
                     {sortBy === 'date' && (sortDirection === 'desc' ? <ArrowDownIcon sx={{ fontSize: 16 }} /> : <ArrowUpIcon sx={{ fontSize: 16 }} />)}
                   </Box>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#334155', borderBottom: '2px solid #e2e8f0' }}>סטטוס אחרון</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: '#334155', borderBottom: '2px solid #e2e8f0', textAlign: 'center' }}>
+                <TableCell sx={tableHeadCellSx}>סטטוס אחרון</TableCell>
+                <TableCell sx={{ ...tableHeadCellSx, textAlign: 'center' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'center' }}>
                     <BugIcon sx={{ fontSize: 18 }} />
                     ממצאים (אחרון)
@@ -341,9 +345,8 @@ function CodeReviewsPage({ user }) {
                         hover
                         onClick={() => toggleExpand(systemGroup.system_name)}
                         sx={{
+                          ...tableBodyRowSx,
                           cursor: 'pointer',
-                          '&:hover': { backgroundColor: '#f8fafc' },
-                          transition: 'background-color 0.2s',
                           ...(isExpanded && { backgroundColor: '#f1f5f9' })
                         }}
                       >
@@ -358,7 +361,7 @@ function CodeReviewsPage({ user }) {
                               {systemGroup.system_name}
                             </Typography>
                             {systemGroup.has_running && (
-                              <CircularProgress size={14} sx={{ color: '#3498DB' }} />
+                              <CircularProgress size={14} sx={{ color: '#A855F7' }} />
                             )}
                           </Box>
                         </TableCell>
@@ -367,8 +370,8 @@ function CodeReviewsPage({ user }) {
                             label={systemGroup.total_scans}
                             size="small"
                             sx={{
-                              backgroundColor: 'rgba(52, 152, 219, 0.12)',
-                              color: '#3498DB',
+                              backgroundColor: 'rgba(168, 85, 247, 0.12)',
+                              color: '#A855F7',
                               fontWeight: 700,
                               fontSize: '0.85rem',
                               minWidth: 36
@@ -401,7 +404,7 @@ function CodeReviewsPage({ user }) {
 
                       {/* Expandable rows - last 5 scans */}
                       <TableRow>
-                        <TableCell sx={{ p: 0, borderBottom: isExpanded ? '1px solid #e2e8f0' : 'none' }} colSpan={6}>
+                        <TableCell sx={{ p: 0, borderBottom: isExpanded ? `1px solid ${APP_BORDER_BLUE}` : 'none' }} colSpan={6}>
                           <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                             <Box sx={{ py: 1, px: 2, backgroundColor: '#fafbfc' }}>
                               <Typography sx={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, mb: 1, mr: 1 }}>
@@ -412,19 +415,19 @@ function CodeReviewsPage({ user }) {
                               <Table size="small">
                                 <TableHead>
                                   <TableRow>
-                                    <TableCell sx={{ fontWeight: 600, color: '#64748b', fontSize: '0.78rem', borderBottom: '1px solid #e2e8f0' }}>תאריך</TableCell>
-                                    <TableCell sx={{ fontWeight: 600, color: '#64748b', fontSize: '0.78rem', borderBottom: '1px solid #e2e8f0' }}>סטטוס</TableCell>
-                                    <TableCell sx={{ fontWeight: 600, color: '#64748b', fontSize: '0.78rem', borderBottom: '1px solid #e2e8f0' }}>Branch</TableCell>
-                                    <TableCell sx={{ fontWeight: 600, color: '#64748b', fontSize: '0.78rem', borderBottom: '1px solid #e2e8f0', textAlign: 'center' }}>ממצאים</TableCell>
-                                    <TableCell sx={{ fontWeight: 600, color: '#64748b', fontSize: '0.78rem', borderBottom: '1px solid #e2e8f0' }}>הופעל ע"י</TableCell>
-                                    <TableCell sx={{ fontWeight: 600, color: '#64748b', fontSize: '0.78rem', borderBottom: '1px solid #e2e8f0', textAlign: 'center' }}>פעולות</TableCell>
+                                    <TableCell sx={tableNestedHeadCellSx}>תאריך</TableCell>
+                                    <TableCell sx={tableNestedHeadCellSx}>סטטוס</TableCell>
+                                    <TableCell sx={tableNestedHeadCellSx}>Branch</TableCell>
+                                    <TableCell sx={{ ...tableNestedHeadCellSx, textAlign: 'center' }}>ממצאים</TableCell>
+                                    <TableCell sx={tableNestedHeadCellSx}>הופעל ע"י</TableCell>
+                                    <TableCell sx={{ ...tableNestedHeadCellSx, textAlign: 'center' }}>פעולות</TableCell>
                                   </TableRow>
                                 </TableHead>
                                 <TableBody>
                                   {systemGroup.latest_reviews.map((review) => {
                                     const isRunning = review.status === 'Running' || review.status === 'Queued';
                                     return (
-                                      <TableRow key={review.task_id} sx={{ '&:hover': { backgroundColor: '#f1f5f9' } }}>
+                                      <TableRow key={review.task_id} sx={tableBodyRowSx}>
                                         <TableCell sx={{ fontSize: '0.82rem', color: '#475569' }}>
                                           {formatDate(review.created_at)}
                                         </TableCell>
@@ -463,7 +466,7 @@ function CodeReviewsPage({ user }) {
                                                 <IconButton
                                                   size="small"
                                                   onClick={(e) => { e.stopPropagation(); navigate(`/code-reviews/${review.task_id}`); }}
-                                                  sx={{ color: '#3498DB', '&:hover': { backgroundColor: 'rgba(52,152,219,0.1)' } }}
+                                                  sx={{ color: '#A855F7', '&:hover': { backgroundColor: 'rgba(52,152,219,0.1)' } }}
                                                   title="צפייה בדוח"
                                                 >
                                                   <ViewIcon sx={{ fontSize: 18 }} />
@@ -510,13 +513,13 @@ function CodeReviewsPage({ user }) {
         {/* Pagination */}
         {totalPages > 1 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2, gap: 2 }}>
-            <IconButton onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} sx={{ color: '#3498DB' }}>
+            <IconButton onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} sx={{ color: '#A855F7' }}>
               <ChevronRightIcon />
             </IconButton>
             <Typography sx={{ color: '#64748b', fontSize: '0.9rem' }}>
               עמוד {page + 1} מתוך {totalPages}
             </Typography>
-            <IconButton onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} sx={{ color: '#3498DB' }}>
+            <IconButton onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} sx={{ color: '#A855F7' }}>
               <ChevronLeftIcon />
             </IconButton>
           </Box>

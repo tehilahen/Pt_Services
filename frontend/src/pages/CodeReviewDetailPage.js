@@ -22,12 +22,13 @@ import {
   ExpandLess as ExpandLessIcon,
   Code as CodeIcon
 } from '@mui/icons-material';
+import { APP_PRIMARY_BLUE, APP_PRIMARY_BLUE_DARK, APP_BORDER_BLUE, APP_SEVERITY_LOW } from '../themeTokens';
 
 const severityColors = {
   Critical: { main: '#dc2626', bg: '#fef2f2', border: '#fca5a5' },
   High: { main: '#ea580c', bg: '#fff7ed', border: '#fdba74' },
   Medium: { main: '#ca8a04', bg: '#fefce8', border: '#fde047' },
-  Low: { main: '#2563eb', bg: '#eff6ff', border: '#93c5fd' }
+  Low: { main: APP_SEVERITY_LOW, bg: '#F0FDF4', border: '#86EFAC' }
 };
 
 const riskMatrix = {
@@ -157,7 +158,7 @@ function CodeReviewDetailPage({ user }) {
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-        <CircularProgress sx={{ color: '#3498DB' }} />
+        <CircularProgress sx={{ color: '#A855F7' }} />
       </Box>
     );
   }
@@ -205,7 +206,7 @@ function CodeReviewDetailPage({ user }) {
   };
 
   return (
-    <Box dir="ltr" sx={{ height: '100%', overflow: 'auto', backgroundColor: '#f8fafc', direction: 'ltr', textAlign: 'left', scrollBehavior: 'smooth' }}>
+    <Box dir="ltr" sx={{ height: '100%', overflow: 'auto', backgroundColor: '#ffffff', direction: 'ltr', textAlign: 'left', scrollBehavior: 'smooth' }}>
       <Container maxWidth="lg" sx={{ py: 3 }}>
         {/* Back Button */}
         <Button
@@ -218,7 +219,7 @@ function CodeReviewDetailPage({ user }) {
 
         {/* Report Header */}
         <Paper sx={{
-          background: 'linear-gradient(135deg, #0c3058 0%, #1e40af 100%)',
+          background: `linear-gradient(135deg, ${APP_PRIMARY_BLUE} 0%, ${APP_PRIMARY_BLUE_DARK} 100%)`,
           color: 'white',
           p: { xs: 3, md: 5 },
           borderRadius: 4,
@@ -255,15 +256,15 @@ function CodeReviewDetailPage({ user }) {
 
         {/* Summary Cards */}
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 2, mb: 2 }}>
-          <SummaryCard label="Total" count={total} color="#0c3058" isTotal onClick={() => document.getElementById('summary-table')?.scrollIntoView({ behavior: 'smooth' })} />
+          <SummaryCard label="Total" count={total} color={APP_PRIMARY_BLUE} isTotal onClick={() => document.getElementById('summary-table')?.scrollIntoView({ behavior: 'smooth' })} />
           <SummaryCard label="Critical" count={severityCounts.Critical} color="#dc2626" onClick={() => scrollToSeverity('Critical')} />
           <SummaryCard label="High" count={severityCounts.High} color="#ea580c" onClick={() => scrollToSeverity('High')} />
           <SummaryCard label="Medium" count={severityCounts.Medium} color="#ca8a04" onClick={() => scrollToSeverity('Medium')} />
-          <SummaryCard label="Low" count={severityCounts.Low} color="#2563eb" onClick={() => scrollToSeverity('Low')} />
+          <SummaryCard label="Low" count={severityCounts.Low} color={APP_SEVERITY_LOW} onClick={() => scrollToSeverity('Low')} />
         </Box>
 
         {/* Current Remediation State */}
-        <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: '#0c3058', textTransform: 'uppercase', letterSpacing: 0.5, mb: 1 }}>
+        <Typography sx={{ fontSize: '0.8rem', fontWeight: 700, color: APP_PRIMARY_BLUE, textTransform: 'uppercase', letterSpacing: 0.5, mb: 1 }}>
           Current Remediation State (as of {formatDateForState(review?.created_at) || '—'})
         </Typography>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 2, mb: 4 }}>
@@ -290,14 +291,14 @@ function CodeReviewDetailPage({ user }) {
         </Box>
 
         {/* Risk Matrix */}
-        <Paper sx={{ borderRadius: 3, mb: 4, overflow: 'hidden', border: '1px solid #e2e8f0', backgroundColor: 'white' }}>
-          <Typography sx={{ fontWeight: 700, color: '#0c3058', p: 2, borderBottom: '2px solid #0c3058', fontSize: '1.2rem' }}>
+        <Paper sx={{ borderRadius: 3, mb: 4, overflow: 'hidden', border: `1px solid ${APP_BORDER_BLUE}`, backgroundColor: 'white' }}>
+          <Typography sx={{ fontWeight: 700, color: APP_PRIMARY_BLUE, p: 2, borderBottom: `2px solid ${APP_PRIMARY_BLUE}`, fontSize: '1.2rem' }}>
             Risk Assessment Matrix
           </Typography>
           <Box sx={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#0c3058', color: 'white' }}>
+                <tr style={{ background: APP_PRIMARY_BLUE, color: 'white' }}>
                   <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '12px', letterSpacing: '0.5px' }}>IMPACT / PROBABILITY</th>
                   {['Low', 'Medium', 'High', 'Very High'].map(p => (
                     <th key={p} style={{ padding: '12px 16px', textAlign: 'center', fontSize: '12px', letterSpacing: '0.5px' }}>{p}</th>
@@ -307,12 +308,12 @@ function CodeReviewDetailPage({ user }) {
               <tbody>
                 {['Critical', 'High', 'Medium', 'Low'].map(impact => (
                   <tr key={impact}>
-                    <td style={{ padding: '12px 16px', fontWeight: 600, background: '#f8fafc', textAlign: 'left', border: '1px solid #e2e8f0' }}>{impact}</td>
+                    <td style={{ padding: '12px 16px', fontWeight: 600, background: '#f8fafc', textAlign: 'left', border: `1px solid ${APP_BORDER_BLUE}` }}>{impact}</td>
                     {['Low', 'Medium', 'High', 'Very High'].map(prob => {
                       const val = riskMatrix[impact][prob];
                       const c = severityColors[val] || severityColors.Medium;
                       return (
-                        <td key={prob} style={{ padding: '12px 16px', textAlign: 'center', background: c.bg, color: c.main, fontWeight: 700, border: '1px solid #e2e8f0' }}>
+                        <td key={prob} style={{ padding: '12px 16px', textAlign: 'center', background: c.bg, color: c.main, fontWeight: 700, border: `1px solid ${APP_BORDER_BLUE}` }}>
                           {val}
                         </td>
                       );
@@ -326,15 +327,15 @@ function CodeReviewDetailPage({ user }) {
 
         {/* Table of Contents */}
         {findings.length > 0 && (
-          <Paper sx={{ borderRadius: 3, mb: 4, p: 3, border: '1px solid #e2e8f0', backgroundColor: 'white' }}>
-            <Typography sx={{ fontWeight: 700, color: '#0c3058', mb: 2, fontSize: '1.1rem' }}>Table of Contents</Typography>
+          <Paper sx={{ borderRadius: 3, mb: 4, p: 3, border: `1px solid ${APP_BORDER_BLUE}`, backgroundColor: 'white' }}>
+            <Typography sx={{ fontWeight: 700, color: APP_PRIMARY_BLUE, mb: 2, fontSize: '1.1rem' }}>Table of Contents</Typography>
             <Box component="ul" sx={{ listStyle: 'none', p: 0, m: 0 }}>
               {findings.map(f => {
                 const sc = severityColors[f.severity] || severityColors.Medium;
                 return (
                   <Box component="li" key={f.finding_id} sx={{
                     display: 'flex', alignItems: 'center', gap: 1.5, py: 0.8,
-                    borderBottom: '1px solid #f1f5f9', cursor: 'pointer',
+                    borderBottom: `1px solid ${APP_BORDER_BLUE}`, cursor: 'pointer',
                     '&:hover': { backgroundColor: '#f8fafc' }
                   }}
                     onClick={() => {
@@ -355,7 +356,7 @@ function CodeReviewDetailPage({ user }) {
         )}
 
         {/* Findings */}
-        <Typography sx={{ fontWeight: 700, color: '#0c3058', mb: 2, fontSize: '1.3rem', borderBottom: '2px solid #0c3058', pb: 1 }}>
+        <Typography sx={{ fontWeight: 700, color: APP_PRIMARY_BLUE, mb: 2, fontSize: '1.3rem', borderBottom: `2px solid ${APP_PRIMARY_BLUE}`, pb: 1 }}>
           Detailed Findings
         </Typography>
 
@@ -367,7 +368,7 @@ function CodeReviewDetailPage({ user }) {
           return (
             <Paper key={f.finding_id} id={`finding-${f.finding_id}`} sx={{
               borderRadius: 3, mb: 2, overflow: 'hidden',
-              border: '1px solid #e2e8f0', backgroundColor: 'white',
+              border: `1px solid ${APP_BORDER_BLUE}`, backgroundColor: 'white',
               transition: 'box-shadow 0.2s',
               '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }
             }}>
@@ -391,7 +392,7 @@ function CodeReviewDetailPage({ user }) {
 
               {/* Finding Body */}
               <Collapse in={isOpen}>
-                <Box sx={{ px: 3, pb: 3, borderTop: '1px solid #e2e8f0' }}>
+                <Box sx={{ px: 3, pb: 3, borderTop: `1px solid ${APP_BORDER_BLUE}` }}>
                   {/* Meta */}
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 1.5, my: 2, p: 2, backgroundColor: '#f8fafc', borderRadius: 2 }}>
                     <MetaItem label="Severity" value={f.severity} />
@@ -435,7 +436,7 @@ function CodeReviewDetailPage({ user }) {
                         fontSize: '0.8rem', overflowX: 'auto', whiteSpace: 'pre', lineHeight: 1.6
                       }}>
                         {f.file_path && (
-                          <Box sx={{ color: '#94a3b8', fontSize: '0.7rem', borderBottom: '1px solid #334155', pb: 0.8, mb: 1 }}>
+                          <Box sx={{ color: '#94a3b8', fontSize: '0.7rem', borderBottom: `1px solid ${APP_BORDER_BLUE}`, pb: 0.8, mb: 1 }}>
                             {f.file_path}
                           </Box>
                         )}
@@ -464,7 +465,7 @@ function CodeReviewDetailPage({ user }) {
                     <Box sx={{ display: 'flex', gap: 0.8, flexWrap: 'wrap', mt: 1 }}>
                       {tags.map((tag, idx) => (
                         <Chip key={idx} label={tag} size="small" variant="outlined"
-                          sx={{ fontSize: '0.7rem', height: 24, color: '#64748b', borderColor: '#e2e8f0' }} />
+                          sx={{ fontSize: '0.7rem', height: 24, color: '#64748b', borderColor: APP_BORDER_BLUE }} />
                       ))}
                     </Box>
                   )}
@@ -476,14 +477,14 @@ function CodeReviewDetailPage({ user }) {
 
         {/* Summary Table */}
         {findings.length > 0 && (
-          <Paper id="summary-table" sx={{ borderRadius: 3, mt: 4, overflow: 'hidden', border: '1px solid #e2e8f0', backgroundColor: 'white' }}>
-            <Typography sx={{ fontWeight: 700, color: '#0c3058', p: 2, borderBottom: '2px solid #0c3058', fontSize: '1.2rem' }}>
+          <Paper id="summary-table" sx={{ borderRadius: 3, mt: 4, overflow: 'hidden', border: `1px solid ${APP_BORDER_BLUE}`, backgroundColor: 'white' }}>
+            <Typography sx={{ fontWeight: 700, color: APP_PRIMARY_BLUE, p: 2, borderBottom: `2px solid ${APP_PRIMARY_BLUE}`, fontSize: '1.2rem' }}>
               Summary & Prioritized Remediation Plan
             </Typography>
             <Box sx={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
                 <thead>
-                  <tr style={{ background: '#0c3058', color: 'white' }}>
+                  <tr style={{ background: APP_PRIMARY_BLUE, color: 'white' }}>
                     <th style={{ padding: '12px 16px', textAlign: 'left' }}>Priority</th>
                     <th style={{ padding: '12px 16px', textAlign: 'left' }}>ID</th>
                     <th style={{ padding: '12px 16px', textAlign: 'left' }}>Finding</th>
@@ -513,7 +514,7 @@ function CodeReviewDetailPage({ user }) {
         )}
 
         {/* Footer */}
-        <Box sx={{ textAlign: 'center', py: 4, color: '#64748b', fontSize: '0.85rem', borderTop: '1px solid #e2e8f0', mt: 4 }}>
+        <Box sx={{ textAlign: 'center', py: 4, color: '#64748b', fontSize: '0.85rem', borderTop: `1px solid ${APP_BORDER_BLUE}`, mt: 4 }}>
           <Typography sx={{ fontWeight: 600, color: '#475569' }}>Security Code Review Report</Typography>
           <Typography sx={{ fontSize: '0.8rem' }}>
             Generated through automated AI-powered source code analysis using Cursor CLI
@@ -531,7 +532,7 @@ function SummaryCard({ label, count, color, isTotal, onClick }) {
   return (
     <Paper onClick={onClick} sx={{
       borderRadius: 3, p: 3, textAlign: 'center',
-      border: isTotal ? `2px solid ${color}` : '1px solid #e2e8f0',
+      border: isTotal ? `2px solid ${color}` : `1px solid ${APP_BORDER_BLUE}`,
       backgroundColor: 'white',
       cursor: 'pointer',
       transition: 'transform 0.2s',
@@ -547,7 +548,7 @@ function RemediationCard({ label, mainValue, total, mainColor, borderHighlight }
   return (
     <Paper sx={{
       borderRadius: 3, p: 3, textAlign: 'center',
-      border: borderHighlight ? `2px solid ${mainColor}` : '1px solid #e2e8f0',
+      border: borderHighlight ? `2px solid ${mainColor}` : `1px solid ${APP_BORDER_BLUE}`,
       backgroundColor: 'white',
       transition: 'transform 0.2s',
       '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }

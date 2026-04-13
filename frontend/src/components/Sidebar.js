@@ -11,6 +11,17 @@ import {
   Assignment as AssignmentIcon,
   Code as CodeIcon
 } from '@mui/icons-material';
+import {
+  APP_ACCENT_GLOW,
+  APP_ACCENT_LIGHT,
+  APP_ACCENT_SURFACE,
+  APP_BACKGROUND_DEFAULT,
+  APP_BORDER_BLUE_SOFT,
+  APP_PRIMARY_BLUE,
+  APP_PRIMARY_BLUE_DARK,
+  APP_TEXT_PRIMARY,
+  APP_TEXT_SECONDARY,
+} from '../themeTokens';
 
 const Sidebar = ({ user, onLogout }) => {
   const location = useLocation();
@@ -73,32 +84,32 @@ const Sidebar = ({ user, onLogout }) => {
       sx={{
         width: 280,
         height: '100vh',
-        backgroundColor: '#063970', // Dark blue from memory
-        borderRight: '2px solid rgba(52, 152, 219, 0.4)', // Blue transparent
-        
+        backgroundColor: APP_BACKGROUND_DEFAULT,
+        borderRight: `1px solid ${APP_BORDER_BLUE_SOFT}`,
         position: 'fixed',
         top: 0,
         left: 0,
         zIndex: 1200,
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        boxShadow: '4px 0 32px rgba(15, 23, 42, 0.06)',
       }}
     >
       {/* כותרת */}
       <Box sx={{ 
         p: 3, 
-        borderBottom: '1px solid rgba(52, 152, 219, 0.3)', // Blue transparent
+        borderBottom: `1px solid ${APP_BORDER_BLUE_SOFT}`,
         textAlign: 'center'
       }}>
         <Typography variant="h6" sx={{ 
-          color: '#ECF0F1', // White
+          color: APP_PRIMARY_BLUE,
           fontWeight: 700,
           mb: 1
         }}>
           PT Service
         </Typography>
         <Typography variant="caption" sx={{ 
-          color: '#BDC3C7' // Light gray
+          color: APP_TEXT_SECONDARY
         }}>
           מערכת לביצוע מבדקי חדירות
         </Typography>
@@ -110,7 +121,7 @@ const Sidebar = ({ user, onLogout }) => {
           const isActive = location.pathname === item.path;
           
           return (
-            <ListItem key={item.path} disablePadding sx={{ mb: 0, '&:not(:last-child)': { borderBottom: '1px solid rgba(52, 152, 219, 0.1)' } }}>
+            <ListItem key={item.path} disablePadding sx={{ mb: 0, '&:not(:last-child)': { borderBottom: `1px solid ${APP_BORDER_BLUE_SOFT}` } }}>
               <ListItemButton
                 component={Link}
                 to={item.path}
@@ -118,18 +129,19 @@ const Sidebar = ({ user, onLogout }) => {
                   borderRadius: 2,
                   py: 1.5,
                   px: 2,
-                  backgroundColor: isActive ? 'rgba(52, 152, 219, 0.2)' : 'transparent', // Blue transparent
-                  border: '1px solid transparent',
+                  backgroundColor: isActive ? APP_ACCENT_LIGHT : 'transparent',
+                  border: isActive ? `1px solid ${APP_ACCENT_GLOW}` : '1px solid transparent',
+                  boxShadow: isActive ? `0 0 20px ${APP_ACCENT_GLOW}` : 'none',
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    backgroundColor: 'rgba(52, 152, 219, 0.3)', // Darker blue transparent
+                    backgroundColor: APP_ACCENT_SURFACE,
                     borderColor: 'transparent'
                   }
                 }}
               >
                 <ListItemIcon sx={{ 
                   minWidth: 40,
-                  color: '#3498DB' // Bright blue
+                  color: isActive ? APP_PRIMARY_BLUE_DARK : APP_PRIMARY_BLUE
                 }}>
                   {item.icon}
                 </ListItemIcon>
@@ -137,7 +149,7 @@ const Sidebar = ({ user, onLogout }) => {
                   primary={item.text}
                   primaryTypographyProps={{
                     sx: {
-                      color: '#ECF0F1', // White
+                      color: APP_TEXT_PRIMARY,
                       fontWeight: isActive ? 700 : 500,
                       fontSize: '0.95rem'
                     }
@@ -151,11 +163,11 @@ const Sidebar = ({ user, onLogout }) => {
         {/* Admin Section - Only visible to Admin users */}
         {isAdmin && (
           <>
-            <Divider sx={{ my: 2, borderColor: 'rgba(52, 152, 219, 0.3)' }} />
+            <Divider sx={{ my: 2, borderColor: APP_BORDER_BLUE_SOFT }} />
             <Typography 
               variant="caption" 
               sx={{ 
-                color: '#BDC3C7', 
+                color: APP_TEXT_SECONDARY,
                 px: 2, 
                 mb: 1, 
                 display: 'block',
@@ -177,18 +189,19 @@ const Sidebar = ({ user, onLogout }) => {
                       borderRadius: 2,
                       py: 1.5,
                       px: 2,
-                      backgroundColor: isActive ? 'rgba(52, 152, 219, 0.2)' : 'transparent',
-                      border: '1px solid transparent',
+                      backgroundColor: isActive ? APP_ACCENT_LIGHT : 'transparent',
+                      border: isActive ? `1px solid ${APP_ACCENT_GLOW}` : '1px solid transparent',
+                      boxShadow: isActive ? `0 0 20px ${APP_ACCENT_GLOW}` : 'none',
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        backgroundColor: 'rgba(52, 152, 219, 0.3)',
+                        backgroundColor: APP_ACCENT_SURFACE,
                         borderColor: 'transparent'
                       }
                     }}
                   >
                     <ListItemIcon sx={{ 
                       minWidth: 40,
-                      color: '#3498DB'
+                      color: isActive ? APP_PRIMARY_BLUE_DARK : APP_PRIMARY_BLUE
                     }}>
                       {item.icon}
                     </ListItemIcon>
@@ -196,7 +209,7 @@ const Sidebar = ({ user, onLogout }) => {
                       primary={item.text}
                       primaryTypographyProps={{
                         sx: {
-                          color: '#ECF0F1',
+                          color: APP_TEXT_PRIMARY,
                           fontWeight: isActive ? 700 : 500,
                           fontSize: '0.95rem'
                         }
@@ -213,11 +226,11 @@ const Sidebar = ({ user, onLogout }) => {
       {/* פוטר */}
       <Box sx={{ 
         p: 2, 
-        borderTop: '1px solid rgba(52, 152, 219, 0.3)', // Blue transparent
+        borderTop: `1px solid ${APP_BORDER_BLUE_SOFT}`,
         textAlign: 'center'
       }}>
         <Typography variant="caption" sx={{ 
-          color: '#BDC3C7', // Light gray
+          color: APP_TEXT_SECONDARY,
           fontSize: '0.75rem',
           fontWeight: 500
         }}>

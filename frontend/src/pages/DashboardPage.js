@@ -16,10 +16,17 @@ import {
 } from '@mui/icons-material';
 import Chart from 'react-apexcharts';
 import axios from 'axios';
+import {
+  APP_BACKGROUND_DEFAULT,
+  APP_FONT_FAMILY,
+  APP_TEXT_PRIMARY,
+  APP_TEXT_SECONDARY,
+} from '../themeTokens';
 
-// צבעים לגרפים - גוונים שמחים וחיים
-const SEVERITY_COLORS = ['#E53935', '#FF7043', '#FFC107', '#4CAF50'];
-const STATUS_COLORS = ['#FF9800', '#43A047', '#5C6BC0', '#29B6F6'];
+/** חומרה — נשמרת קריאה לנתונים */
+const SEVERITY_COLORS = ['#DC2626', '#EA580C', '#D97706', '#16A34A'];
+/** סטטוס טיפול — נגיעות tech */
+const STATUS_COLORS = ['#F59E0B', '#A855F7', '#64748B', '#06B6D4'];
 
 function DashboardPage({ user }) {
   const navigate = useNavigate();
@@ -94,7 +101,7 @@ function DashboardPage({ user }) {
   const severityChartOptions = {
     chart: {
       type: 'pie',
-      fontFamily: 'Heebo, Arial, sans-serif',
+      fontFamily: APP_FONT_FAMILY,
       animations: {
         enabled: true,
         easing: 'easeinout',
@@ -120,11 +127,11 @@ function DashboardPage({ user }) {
     colors: SEVERITY_COLORS,
     legend: {
       position: 'bottom',
-      fontFamily: 'Heebo, Arial, sans-serif',
+      fontFamily: APP_FONT_FAMILY,
       fontSize: '13px',
       fontWeight: 500,
       labels: {
-        colors: '#2c3e50'
+        colors: APP_TEXT_PRIMARY
       },
       markers: {
         width: 12,
@@ -139,7 +146,7 @@ function DashboardPage({ user }) {
       },
       style: {
         fontSize: '14px',
-        fontFamily: 'Heebo, Arial, sans-serif',
+        fontFamily: APP_FONT_FAMILY,
         fontWeight: 'bold'
       },
       dropShadow: {
@@ -151,14 +158,14 @@ function DashboardPage({ user }) {
       theme: 'dark',
       style: {
         fontSize: '14px',
-        fontFamily: 'Heebo, Arial, sans-serif'
+        fontFamily: APP_FONT_FAMILY
       },
       custom: function({ series, seriesIndex, w }) {
         const label = w.globals.labels[seriesIndex];
         const value = series[seriesIndex];
-        return '<div style="background: #2c3e50; color: #fff; padding: 12px 16px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-family: Heebo, Arial, sans-serif; direction: rtl;">' +
+        return '<div style="background: #0f172a; border: 1px solid rgba(168,85,247,0.25); color: #fff; padding: 12px 16px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-family: ' + APP_FONT_FAMILY + '; direction: rtl;">' +
           '<div style="font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #fff;">' + label + '</div>' +
-          '<div style="font-size: 18px; color: #55c6c2; font-weight: 700;">' + value + ' ממצאים</div>' +
+          '<div style="font-size: 18px; color: #A855F7; font-weight: 700;">' + value + ' ממצאים</div>' +
           '</div>';
       }
     },
@@ -191,7 +198,7 @@ function DashboardPage({ user }) {
   const statusChartOptions = {
     chart: {
       type: 'donut',
-      fontFamily: 'Heebo, Arial, sans-serif',
+      fontFamily: APP_FONT_FAMILY,
       animations: {
         enabled: true,
         easing: 'easeinout',
@@ -209,11 +216,11 @@ function DashboardPage({ user }) {
     colors: STATUS_COLORS.slice(0, statusData.labels.length),
     legend: {
       position: 'bottom',
-      fontFamily: 'Heebo, Arial, sans-serif',
+      fontFamily: APP_FONT_FAMILY,
       fontSize: '13px',
       fontWeight: 500,
       labels: {
-        colors: '#2c3e50'
+        colors: APP_TEXT_PRIMARY
       }
     },
     dataLabels: {
@@ -223,7 +230,7 @@ function DashboardPage({ user }) {
       },
       style: {
         fontSize: '14px',
-        fontFamily: 'Heebo, Arial, sans-serif',
+        fontFamily: APP_FONT_FAMILY,
         fontWeight: 'bold'
       }
     },
@@ -247,22 +254,22 @@ function DashboardPage({ user }) {
             name: {
               show: true,
               fontSize: '14px',
-              fontFamily: 'Heebo, Arial, sans-serif',
-              color: '#2c3e50'
+              fontFamily: APP_FONT_FAMILY,
+              color: APP_TEXT_PRIMARY
             },
             value: {
               show: true,
               fontSize: '22px',
-              fontFamily: 'Heebo, Arial, sans-serif',
+              fontFamily: APP_FONT_FAMILY,
               fontWeight: 700,
-              color: '#2c3e50'
+              color: APP_TEXT_PRIMARY
             },
             total: {
               show: true,
               label: 'סה״כ',
               fontSize: '14px',
-              fontFamily: 'Heebo, Arial, sans-serif',
-              color: '#7f8c8d',
+              fontFamily: APP_FONT_FAMILY,
+              color: APP_TEXT_SECONDARY,
               formatter: function(w) {
                 return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
               }
@@ -277,7 +284,7 @@ function DashboardPage({ user }) {
   const barChartOptions = {
     chart: {
       type: 'bar',
-      fontFamily: 'Heebo, Arial, sans-serif',
+      fontFamily: APP_FONT_FAMILY,
       toolbar: {
         show: false
       },
@@ -309,15 +316,15 @@ function DashboardPage({ user }) {
         }
       }
     },
-    colors: ['#29B6F6', '#66BB6A', '#FFC107', '#FF7043', '#5C6BC0'],
+    colors: ['#A855F7', '#10B981', '#34D399', '#059669', '#6EE7B7'],
     dataLabels: {
       enabled: true,
       offsetY: -25,
       style: {
         fontSize: '14px',
-        fontFamily: 'Heebo, Arial, sans-serif',
+        fontFamily: APP_FONT_FAMILY,
         fontWeight: 700,
-        colors: ['#2c3e50']
+        colors: [APP_TEXT_PRIMARY]
       }
     },
     legend: {
@@ -328,8 +335,8 @@ function DashboardPage({ user }) {
       labels: {
         style: {
           fontSize: '11px',
-          fontFamily: 'Heebo, Arial, sans-serif',
-          colors: '#2c3e50',
+          fontFamily: APP_FONT_FAMILY,
+          colors: APP_TEXT_PRIMARY,
           fontWeight: 600
         },
         rotate: -25,
@@ -354,7 +361,7 @@ function DashboardPage({ user }) {
       }
     },
     grid: {
-      borderColor: '#f0f0f0',
+      borderColor: 'rgba(168, 85, 247, 0.22)',
       strokeDashArray: 0,
       xaxis: {
         lines: {
@@ -372,14 +379,14 @@ function DashboardPage({ user }) {
       theme: 'dark',
       style: {
         fontSize: '14px',
-        fontFamily: 'Heebo, Arial, sans-serif'
+        fontFamily: APP_FONT_FAMILY
       },
       custom: function({ series, seriesIndex, dataPointIndex, w }) {
         const systemName = w.globals.labels[dataPointIndex];
         const value = series[seriesIndex][dataPointIndex];
-        return '<div style="background: #2c3e50; color: #fff; padding: 12px 16px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-family: Heebo, Arial, sans-serif; direction: rtl;">' +
+        return '<div style="background: #0f172a; border: 1px solid rgba(168,85,247,0.25); color: #fff; padding: 12px 16px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-family: ' + APP_FONT_FAMILY + '; direction: rtl;">' +
           '<div style="font-weight: 700; font-size: 15px; margin-bottom: 6px; color: #fff;">' + systemName + '</div>' +
-          '<div style="font-size: 18px; color: #55c6c2; font-weight: 700;">' + value + ' ממצאים</div>' +
+          '<div style="font-size: 18px; color: #A855F7; font-weight: 700;">' + value + ' ממצאים</div>' +
           '</div>';
       }
     }
@@ -396,46 +403,37 @@ function DashboardPage({ user }) {
         <CircularProgress 
           size={60} 
           sx={{ 
-            color: '#1E88E5',
+            color: '#A855F7',
             '& .MuiCircularProgress-circle': {
               strokeLinecap: 'round',
             }
           }} 
         />
-        <Typography variant="h6" sx={{ mt: 2, color: '#2c3e50' }}>
+        <Typography variant="h6" sx={{ mt: 2, color: APP_TEXT_PRIMARY }}>
           טוען דאשבורד...
         </Typography>
       </Container>
     );
   }
 
+  const paperChartSx = {
+    p: 3,
+    height: 380,
+    backgroundColor: '#fff',
+    borderRadius: '14px',
+    border: '1px solid #E2E8F0',
+    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+    transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+    '&:hover': {
+      boxShadow: '0 8px 28px rgba(168, 85, 247, 0.12)',
+      transform: 'translateY(-2px)',
+    },
+  };
+
   return (
     <Box sx={{
       height: 'fit-content',
-      background: '#f8f9fa',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(52, 152, 219, 0.03)',
-        pointerEvents: 'none',
-        zIndex: 0
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(138, 43, 226, 0.02)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }
+      background: APP_BACKGROUND_DEFAULT,
     }}>
       <Container maxWidth="xl" sx={{ py: 3, position: 'relative', zIndex: 1 }}>
         {/* Header */}
@@ -445,20 +443,20 @@ function DashboardPage({ user }) {
               <IconButton 
                 onClick={() => navigate(-1)} 
                 sx={{ 
-                  color: '#7f8c8d',
+                  color: APP_TEXT_SECONDARY,
                   mr: 2,
-                  '&:hover': { color: '#1E88E5', backgroundColor: 'rgba(30, 136, 229, 0.1)' }
+                  '&:hover': { color: '#A855F7', backgroundColor: 'rgba(168, 85, 247, 0.1)' }
                 }}
               >
                 <ArrowBackIcon />
               </IconButton>
-              <SecurityIcon sx={{ fontSize: 36, color: '#1E88E5', mr: 1.5 }} />
+              <SecurityIcon sx={{ fontSize: 36, color: '#A855F7', mr: 1.5 }} />
               <Typography 
                 variant="h4" 
                 component="h1" 
                 sx={{ 
                   fontWeight: 800,
-                  color: '#2c3e50',
+                  color: APP_TEXT_PRIMARY,
                   letterSpacing: '-0.5px'
                 }}
               >
@@ -473,18 +471,7 @@ function DashboardPage({ user }) {
           {/* גרף A - פיי חומרה */}
           <Grid item xs={12} md={4}>
             <Fade in={true} timeout={800}>
-              <Paper sx={{
-                p: 3,
-                height: 380,
-                backgroundColor: '#fff',
-                borderRadius: '16px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  boxShadow: '0 8px 30px rgba(30, 136, 229, 0.15)',
-                  transform: 'translateY(-3px)'
-                }
-              }}>
+              <Paper sx={paperChartSx}>
                 <Typography 
                   variant="h6" 
                   component="h2" 
@@ -492,7 +479,7 @@ function DashboardPage({ user }) {
                     mb: 1, 
                     textAlign: 'center',
                     fontWeight: 700,
-                    color: '#2c3e50',
+                    color: APP_TEXT_PRIMARY,
                     fontSize: '1rem'
                   }}
                 >
@@ -511,18 +498,7 @@ function DashboardPage({ user }) {
           {/* גרף B - דונאט סטטוס */}
           <Grid item xs={12} md={4}>
             <Fade in={true} timeout={1000}>
-              <Paper sx={{
-                p: 3,
-                height: 380,
-                backgroundColor: '#fff',
-                borderRadius: '16px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  boxShadow: '0 8px 30px rgba(30, 136, 229, 0.15)',
-                  transform: 'translateY(-3px)'
-                }
-              }}>
+              <Paper sx={paperChartSx}>
                 <Typography 
                   variant="h6" 
                   component="h2" 
@@ -530,7 +506,7 @@ function DashboardPage({ user }) {
                     mb: 1, 
                     textAlign: 'center',
                     fontWeight: 700,
-                    color: '#2c3e50',
+                    color: APP_TEXT_PRIMARY,
                     fontSize: '1rem'
                   }}
                 >
@@ -545,7 +521,7 @@ function DashboardPage({ user }) {
                   />
                 ) : (
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 310 }}>
-                    <Typography sx={{ color: '#7f8c8d' }}>אין נתונים להצגה</Typography>
+                    <Typography sx={{ color: APP_TEXT_SECONDARY }}>אין נתונים להצגה</Typography>
                   </Box>
                 )}
               </Paper>
@@ -555,18 +531,7 @@ function DashboardPage({ user }) {
           {/* גרף C - עמודות מערכות */}
           <Grid item xs={12} md={4}>
             <Fade in={true} timeout={1200}>
-              <Paper sx={{
-                p: 3,
-                height: 380,
-                backgroundColor: '#fff',
-                borderRadius: '16px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  boxShadow: '0 8px 30px rgba(30, 136, 229, 0.15)',
-                  transform: 'translateY(-3px)'
-                }
-              }}>
+              <Paper sx={paperChartSx}>
                 <Typography 
                   variant="h6" 
                   component="h2" 
@@ -574,7 +539,7 @@ function DashboardPage({ user }) {
                     mb: 1, 
                     textAlign: 'center',
                     fontWeight: 700,
-                    color: '#2c3e50',
+                    color: APP_TEXT_PRIMARY,
                     fontSize: '1rem'
                   }}
                 >
@@ -589,7 +554,7 @@ function DashboardPage({ user }) {
                   />
                 ) : (
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 310 }}>
-                    <Typography sx={{ color: '#7f8c8d' }}>אין נתונים להצגה</Typography>
+                    <Typography sx={{ color: APP_TEXT_SECONDARY }}>אין נתונים להצגה</Typography>
                   </Box>
                 )}
               </Paper>

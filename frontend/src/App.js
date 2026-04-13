@@ -22,106 +22,124 @@ import ManualPTTrackingPage from './pages/ManualPTTrackingPage';
 import CodeReviewsPage from './pages/CodeReviewsPage';
 import CodeReviewDetailPage from './pages/CodeReviewDetailPage';
 import DashboardPage from './pages/DashboardPage';
-// יצירת עיצוב מותאם אישית עם צבעים נעימים יותר
+import {
+  APP_ACCENT_GLOW_STRONG,
+  APP_BACKGROUND_DEFAULT,
+  APP_BACKGROUND_PAPER,
+  APP_BORDER_BLUE,
+  APP_BORDER_BLUE_SOFT,
+  APP_FONT_FAMILY,
+  APP_PRIMARY_BLUE,
+  APP_PRIMARY_BLUE_DARK,
+  APP_PRIMARY_BLUE_LIGHT,
+  APP_SEVERITY_CRITICAL,
+  APP_SEVERITY_HIGH,
+  APP_SEVERITY_LOW,
+  APP_SEVERITY_MEDIUM,
+  APP_TEXT_PRIMARY,
+  APP_TEXT_SECONDARY,
+} from './themeTokens';
+
 const theme = createTheme({
   direction: 'rtl',
   palette: {
+    mode: 'light',
     primary: {
-      main: '#2596be', // כחול נעים
-      light: '#3ba6d4',
-      dark: '#1e7a9a',
+      main: APP_PRIMARY_BLUE,
+      light: APP_PRIMARY_BLUE_LIGHT,
+      dark: APP_PRIMARY_BLUE_DARK,
     },
     secondary: {
-      main: '#ec4899', // ורוד נעים
-      light: '#f472b6',
-      dark: '#db2777',
+      main: APP_TEXT_SECONDARY,
+      light: '#64748b',
+      dark: '#334155',
     },
+    divider: APP_BORDER_BLUE_SOFT,
     background: {
-      default: '#0f172a', // כחול כהה
-      paper: '#1e293b', // כחול כהה יותר
+      default: APP_BACKGROUND_DEFAULT,
+      paper: APP_BACKGROUND_PAPER,
     },
     text: {
-      primary: '#f8fafc',
-      secondary: '#cbd5e1',
+      primary: APP_TEXT_PRIMARY,
+      secondary: APP_TEXT_SECONDARY,
     },
     success: {
-      main: '#10b981', // ירוק נעים
-      light: '#34d399',
-      dark: '#059669',
+      main: APP_SEVERITY_LOW,
+      light: '#A855F7',
+      dark: '#7C3AED',
     },
     warning: {
-      main: '#f59e0b', // כתום נעים
-      light: '#fbbf24',
-      dark: '#d97706',
+      main: APP_SEVERITY_MEDIUM,
+      light: APP_SEVERITY_HIGH,
+      dark: '#b45309',
     },
     error: {
-      main: '#ef4444', // אדום נעים
-      light: '#f87171',
-      dark: '#dc2626',
+      main: APP_SEVERITY_CRITICAL,
+      light: '#ef4444',
+      dark: '#b91c1c',
     },
   },
   typography: {
-    fontFamily: 'Heebo, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    h1: { 
-      fontWeight: 800, 
-      color: '#f8fafc',
+    fontFamily: APP_FONT_FAMILY,
+    h1: {
+      fontWeight: 700,
+      color: APP_TEXT_PRIMARY,
       fontSize: '2.5rem',
-      letterSpacing: '-0.025em'
+      letterSpacing: '-0.025em',
     },
-    h2: { 
-      fontWeight: 700, 
-      color: '#f8fafc',
+    h2: {
+      fontWeight: 700,
+      color: APP_TEXT_PRIMARY,
       fontSize: '2rem',
-      letterSpacing: '-0.025em'
+      letterSpacing: '-0.025em',
     },
-    h3: { 
-      fontWeight: 700, 
-      color: '#f8fafc',
+    h3: {
+      fontWeight: 700,
+      color: APP_TEXT_PRIMARY,
       fontSize: '1.75rem',
-      letterSpacing: '-0.025em'
+      letterSpacing: '-0.025em',
     },
-    h4: { 
-      fontWeight: 600, 
-      color: '#f8fafc',
+    h4: {
+      fontWeight: 600,
+      color: APP_TEXT_PRIMARY,
       fontSize: '1.5rem',
-      letterSpacing: '-0.025em'
+      letterSpacing: '-0.025em',
     },
-    h5: { 
-      fontWeight: 600, 
-      color: '#f8fafc',
+    h5: {
+      fontWeight: 600,
+      color: APP_TEXT_PRIMARY,
       fontSize: '1.25rem',
-      letterSpacing: '-0.025em'
+      letterSpacing: '-0.025em',
     },
-    h6: { 
-      fontWeight: 600, 
-      color: '#f8fafc',
+    h6: {
+      fontWeight: 600,
+      color: APP_TEXT_PRIMARY,
       fontSize: '1.125rem',
-      letterSpacing: '-0.025em'
+      letterSpacing: '-0.025em',
     },
-    body1: { 
-      color: '#e2e8f0',
+    body1: {
+      color: APP_TEXT_PRIMARY,
       fontSize: '1rem',
-      lineHeight: 1.6
+      lineHeight: 1.6,
     },
-    body2: { 
-      color: '#cbd5e1',
+    body2: {
+      color: APP_TEXT_SECONDARY,
       fontSize: '0.875rem',
-      lineHeight: 1.5
+      lineHeight: 1.5,
     },
   },
   components: {
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
-          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1)',
-          backgroundColor: '#1e293b',
-          border: '1px solid #334155',
-          backdropFilter: 'blur(10px)',
-          transition: 'all 0.3s ease-in-out',
+          borderRadius: 14,
+          boxShadow: '0 1px 2px rgba(15, 23, 42, 0.05)',
+          backgroundColor: APP_BACKGROUND_PAPER,
+          border: `1px solid ${APP_BORDER_BLUE}`,
+          transition: 'box-shadow 0.2s ease, transform 0.2s ease',
           '&:hover': {
-            transform: 'translateY(-4px)',
-            boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.4), 0 8px 12px -4px rgba(0, 0, 0, 0.15)',
+            transform: 'translateY(-1px)',
+            boxShadow: '0 8px 24px -6px rgba(15, 23, 42, 0.1)',
           },
         },
       },
@@ -140,11 +158,13 @@ const theme = createTheme({
           },
         },
         contained: {
-          background: 'linear-gradient(135deg, #2596be 0%, #3ba6d4 100%)',
-          boxShadow: '0 4px 12px rgba(37, 150, 190, 0.4)',
+          background: APP_PRIMARY_BLUE,
+          backgroundImage: 'none',
+          boxShadow: `0 1px 2px rgba(15, 23, 42, 0.06), 0 2px 8px ${APP_ACCENT_GLOW_STRONG}`,
           '&:hover': {
-            background: 'linear-gradient(135deg, #1e7a9a 0%, #2596be 100%)',
-            boxShadow: '0 6px 16px rgba(37, 150, 190, 0.5)',
+            background: APP_PRIMARY_BLUE_DARK,
+            backgroundImage: 'none',
+            boxShadow: `0 4px 14px ${APP_ACCENT_GLOW_STRONG}`,
           },
         },
       },
@@ -152,9 +172,23 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1e293b',
-          border: '1px solid #334155',
+          backgroundColor: APP_BACKGROUND_PAPER,
+          border: `1px solid ${APP_BORDER_BLUE}`,
           borderRadius: 16,
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderColor: APP_BORDER_BLUE,
+        },
+      },
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderColor: APP_BORDER_BLUE_SOFT,
         },
       },
     },
@@ -232,7 +266,8 @@ function App() {
           justifyContent: 'center', 
           alignItems: 'center', 
           height: '100vh',
-          backgroundColor: '#0f172a'
+          backgroundColor: APP_BACKGROUND_DEFAULT,
+          color: APP_TEXT_SECONDARY
         }}>
           <div>טוען...</div>
         </Box>
@@ -258,7 +293,7 @@ function App() {
       <div style={{ 
         minHeight: '100vh', 
         display: 'flex',
-        backgroundColor: '#f4f5f9',
+        backgroundColor: APP_BACKGROUND_DEFAULT,
         filter: !user ? 'blur(5px)' : 'none',
         pointerEvents: !user ? 'none' : 'auto',
         transition: 'filter 0.3s ease-in-out'
@@ -273,10 +308,12 @@ function App() {
           display: 'flex', 
           flexDirection: 'column',
           height: '100vh',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          backgroundColor: APP_BACKGROUND_DEFAULT,
+          minHeight: 0,
         }}>
           <Header user={user} onLogout={handleLogout} />
-          <main style={{ flex: 1, padding: 0, overflow: 'hidden' }}>
+          <main style={{ flex: 1, padding: 0, overflow: 'hidden', backgroundColor: APP_BACKGROUND_DEFAULT, minHeight: 0 }}>
             <Routes>
               <Route path="/" element={<HomePage user={user} />} />
               <Route path="/system/:id" element={<SystemPageNew />} />

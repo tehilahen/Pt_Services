@@ -1,52 +1,57 @@
 import { createTheme } from '@mui/material/styles';
+import {
+  APP_BACKGROUND_DEFAULT,
+  APP_BACKGROUND_PAPER,
+  APP_FONT_FAMILY,
+  APP_PRIMARY_BLUE,
+  APP_PRIMARY_BLUE_DARK,
+  APP_PRIMARY_BLUE_LIGHT,
+  APP_SEVERITY_CRITICAL,
+  APP_SEVERITY_LOW,
+  APP_SEVERITY_MEDIUM,
+  APP_TEXT_PRIMARY,
+  APP_TEXT_SECONDARY,
+} from './themeTokens';
 
 const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#1E88E5',
-      light: '#42A5F5',
-      dark: '#1565C0'
+      main: APP_PRIMARY_BLUE,
+      light: APP_PRIMARY_BLUE_LIGHT,
+      dark: APP_PRIMARY_BLUE_DARK
     },
     secondary: {
-      main: '#43A047',
-      light: '#66BB6A',
-      dark: '#2E7D32'
+      main: APP_TEXT_SECONDARY,
+      light: '#64748B',
+      dark: '#1E293B'
     },
     error: {
-      main: '#E53935'
+      main: APP_SEVERITY_CRITICAL
     },
     warning: {
-      main: '#FFC107'
+      main: APP_SEVERITY_MEDIUM
     },
     info: {
-      main: '#29B6F6'
+      main: APP_PRIMARY_BLUE
     },
     success: {
-      main: '#43A047'
+      main: APP_SEVERITY_LOW
     },
     text: {
-      primary: '#263238',
-      secondary: '#546E7A'
+      primary: APP_TEXT_PRIMARY,
+      secondary: APP_TEXT_SECONDARY
     },
     background: {
-      default: '#FAFAFA',
-      paper: '#ffffff'
+      default: APP_BACKGROUND_DEFAULT,
+      paper: APP_BACKGROUND_PAPER
     }
   },
   typography: {
-    fontFamily: [
-      'Heebo',
-      'Rubik',
-      'Segoe UI',
-      'Tahoma',
-      'Geneva',
-      'Verdana',
-      'sans-serif'
-    ].join(','),
-    h1: { fontWeight: 800 },
-    h2: { fontWeight: 800 },
-    h3: { fontWeight: 800 },
+    fontFamily: APP_FONT_FAMILY,
+    h1: { fontWeight: 700 },
+    h2: { fontWeight: 700 },
+    h3: { fontWeight: 700 },
     h4: { fontWeight: 700 },
     h5: { fontWeight: 700 },
     h6: { fontWeight: 700 }
@@ -78,11 +83,11 @@ const theme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
-          backgroundColor: 'rgba(255, 255, 255, 0.9)'
+          backgroundColor: APP_BACKGROUND_PAPER
         }
       }
     }
   }
 });
 
-export default theme; 
+export default theme;

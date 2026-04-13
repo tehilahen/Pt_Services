@@ -26,6 +26,14 @@ import {
   TableHead,
   TableRow
 } from '@mui/material';
+import { APP_BORDER_BLUE } from '../themeTokens';
+import {
+  tableContainerPaperSx,
+  tableHeadCellSx,
+  tableBodyRowSx,
+  tableScrollbarSx,
+  tableStickyRtlSx
+} from '../tableStyles';
 import { 
   BugReport as BugIcon,
   Warning as WarningIcon,
@@ -183,7 +191,7 @@ function AllVulnerabilitiesPage({ user }) {
       <Container maxWidth="xl" sx={{ py: 4, textAlign: 'center' }}>
         <CircularProgress size={60} 
         sx={{
-          color: '#3498DB', // Bright blue for loading indicator
+          color: '#A855F7', // Bright blue for loading indicator
           '& .MuiCircularProgress-circle': {
             strokeLinecap: 'round',
           }
@@ -212,30 +220,7 @@ function AllVulnerabilitiesPage({ user }) {
       height: 'fit-content',
       display: 'flex',
       flexDirection: 'column',
-      background: '#f8f9fa',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(52, 152, 219, 0.03)',
-        pointerEvents: 'none',
-        zIndex: 0
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(138, 43, 226, 0.02)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }
+      background: '#ffffff',
     }}>
       <Container maxWidth="xl" sx={{ py: 4, position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
       <Fade in timeout={600}>
@@ -250,9 +235,9 @@ function AllVulnerabilitiesPage({ user }) {
                   p: 1,
                   bgcolor: 'rgba(255, 255, 255, 0.95)',
                   backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(52, 152, 219, 0.2)',
+                  border: '1px solid rgba(168, 85, 247, 0.2)',
                   borderRadius: 4,
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(52, 152, 219, 0.1)',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(168, 85, 247, 0.1)',
                   display: 'inline-flex',
                   gap: 0.5
                 }}
@@ -300,24 +285,24 @@ function AllVulnerabilitiesPage({ user }) {
 
                       '&:hover': {
 
-                        backgroundColor: 'rgba(52, 152, 219, 0.08)',
+                        backgroundColor: 'rgba(168, 85, 247, 0.08)',
                         transform: 'translateY(-1px)',
-                        boxShadow: '0 2px 8px rgba(52, 152, 219, 0.15)'
+                        boxShadow: '0 2px 8px rgba(168, 85, 247, 0.15)'
 
                      
 
                       },
                       '&.Mui-selected': {
-                        backgroundColor: '#3498DB',
+                        backgroundColor: '#A855F7',
                         color: '#ffffff',
 
-                        boxShadow: '0 4px 12px rgba(52, 152, 219, 0.3)',
+                        boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)',
                         '&:hover': {
 
                      
-                          backgroundColor: '#2980b9',
+                          backgroundColor: '#7C3AED',
                           transform: 'translateY(-1px)',
-                          boxShadow: '0 6px 16px rgba(52, 152, 219, 0.4)'
+                          boxShadow: '0 6px 16px rgba(168, 85, 247, 0.4)'
                         },
                         '&::before': {
                           background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%)'
@@ -331,7 +316,7 @@ function AllVulnerabilitiesPage({ user }) {
                 >
                   <ToggleButton value="all" sx={{ 
                     '&.Mui-selected': { 
-                      backgroundColor: '#3498DB',
+                      backgroundColor: '#A855F7',
                     } 
                   }}>
                     כל הממצאים
@@ -437,12 +422,12 @@ function AllVulnerabilitiesPage({ user }) {
                   width: '100%',
                   bgcolor: 'rgba(255, 255, 255, 0.95)',
                   backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(52, 152, 219, 0.2)',
+                  border: '1px solid rgba(168, 85, 247, 0.2)',
                   borderRadius: 4,
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(52, 152, 219, 0.1)',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(168, 85, 247, 0.1)',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    boxShadow: '0 6px 24px rgba(52, 152, 219, 0.12), 0 0 0 1px rgba(52, 152, 219, 0.2)',
+                    boxShadow: '0 6px 24px rgba(168, 85, 247, 0.12), 0 0 0 1px rgba(168, 85, 247, 0.2)',
                     transform: 'translateY(-1px)'
                   }
                 }}
@@ -491,7 +476,7 @@ function AllVulnerabilitiesPage({ user }) {
                     startAdornment: (
                       <InputAdornment position="start" sx={{ ml: 1 }}>
                         <SearchIcon sx={{ 
-                          color: searchTerm ? '#3498DB' : '#95a5a6',
+                          color: searchTerm ? '#A855F7' : '#95a5a6',
                           transition: 'color 0.3s ease',
                           fontSize: 24
                         }} /> 
@@ -509,60 +494,38 @@ function AllVulnerabilitiesPage({ user }) {
               p: 6,
               textAlign: 'center',
               background: 'rgba(255, 255, 255, 0.9)',
-              border: '1px solid rgba(52, 152, 219, 0.2)',
+              border: '1px solid rgba(168, 85, 247, 0.2)',
               borderRadius: '12px',
               boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
             }}>
-              <BugIcon sx={{ fontSize: 48, color: '#3498DB', mb: 2, opacity: 0.7 }} />
+              <BugIcon sx={{ fontSize: 48, color: '#A855F7', mb: 2, opacity: 0.7 }} />
               <Typography variant="h6" sx={{ color: '#2c3e50', fontWeight: 600 }}>
                 {searchTerm || severityFilter !== 'all' ? 'לא נמצאו ממצאים התואמים לסינון' : 'אין ממצאים במערכת'}
               </Typography>
             </Paper>
           ) : (
             <TableContainer component={Paper} sx={{
-              background: '#ffffff',
-              border: '1px solid #e0e0e0',
-              borderRadius: '16px',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-              direction: 'rtl',
+              ...tableContainerPaperSx,
+              ...tableScrollbarSx,
               maxHeight: '70vh',
               overflow: 'auto',
-              scrollBehavior: 'smooth',
-              '&::-webkit-scrollbar': {
-                width: '6px',
-                height: '6px'
-              },
-              '&::-webkit-scrollbar-track': {
-                background: 'transparent'
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: 'rgba(0, 0, 0, 0.2)',
-                borderRadius: '3px'
-              },
-              '&::-webkit-scrollbar-thumb:hover': {
-                background: 'rgba(0, 0, 0, 0.3)'
-              }
+              scrollBehavior: 'smooth'
             }}>
-              <Table stickyHeader aria-label="all vulnerabilities table" sx={{ direction: 'rtl' }}>
+              <Table stickyHeader aria-label="all vulnerabilities table" sx={tableStickyRtlSx}>
                 <TableHead>
                   <TableRow>
-                    <TableCell align="right" sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>מערכות</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>חומרה</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>תיאור</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>המלצה לטיפול</TableCell>
-                    <TableCell align="center" sx={{ backgroundColor: '#3498DB', borderBottom: 'none', width: '60px', py: 2 }}></TableCell>
+                    <TableCell align="right" sx={tableHeadCellSx}>מערכות</TableCell>
+                    <TableCell align="right" sx={tableHeadCellSx}>חומרה</TableCell>
+                    <TableCell align="right" sx={tableHeadCellSx}>תיאור</TableCell>
+                    <TableCell align="right" sx={tableHeadCellSx}>המלצה לטיפול</TableCell>
+                    <TableCell align="center" sx={{ ...tableHeadCellSx, width: '60px' }}></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {sortedVulnerabilities.map((vuln, index) => (
                     <TableRow 
                       key={`${vuln.description}-${vuln.osvdb_id}-${index}`}
-                      sx={{
-                        backgroundColor: '#ffffff',
-                        '&:hover': { backgroundColor: '#f5f8ff' },
-                        borderBottom: '1px solid #f0f0f0',
-                        transition: 'background-color 0.2s ease'
-                      }}
+                      sx={tableBodyRowSx}
                     >
                       <TableCell align="right" sx={{ py: 2 }}>
                         <Box sx={{ 
@@ -572,8 +535,8 @@ function AllVulnerabilitiesPage({ user }) {
                           px: 1.5,
                           py: 0.5,
                           borderRadius: 2,
-                          bgcolor: 'rgba(52, 152, 219, 0.1)',
-                          color: '#3498DB',
+                          bgcolor: 'rgba(168, 85, 247, 0.1)',
+                          color: '#A855F7',
                           fontWeight: 700,
                           fontSize: '0.9rem'
                         }}>
@@ -647,7 +610,7 @@ function AllVulnerabilitiesPage({ user }) {
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       style={{
-                                        color: '#3498DB',
+                                        color: '#A855F7',
                                         textDecoration: 'none',
                                         fontWeight: 500,
                                         fontSize: '0.85rem',
@@ -677,7 +640,7 @@ function AllVulnerabilitiesPage({ user }) {
                         <IconButton 
                           size="small" 
                           onClick={() => handleOpenDialog(vuln)}
-                          sx={{ color: '#3498DB' }}
+                          sx={{ color: '#A855F7' }}
                         >
                           <VisibilityIcon fontSize="small" />
                         </IconButton>
@@ -708,7 +671,8 @@ function AllVulnerabilitiesPage({ user }) {
         }}
       >
         <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #3498DB 0%, #2980b9 100%)',
+          background: '#0f172a',
+          borderBottom: '2px solid #A855F7',
           color: '#ffffff',
           display: 'flex',
           justifyContent: 'space-between',
@@ -764,14 +728,14 @@ function AllVulnerabilitiesPage({ user }) {
                   <Box sx={{ 
                     p: 3, 
                     borderRadius: 3, 
-                    bgcolor: 'rgba(52, 152, 219, 0.08)',
-                    border: '2px solid rgba(52, 152, 219, 0.3)',
+                    bgcolor: 'rgba(168, 85, 247, 0.08)',
+                    border: '2px solid rgba(168, 85, 247, 0.3)',
                     textAlign: 'center'
                   }}>
                     <Typography variant="body2" sx={{ color: '#7f8c8d', mb: 1.5, fontWeight: 600, fontSize: '0.85rem' }}>
                       מספר מערכות מושפעות
                     </Typography>
-                    <Typography variant="h5" sx={{ color: '#3498DB', fontWeight: 800 }}>
+                    <Typography variant="h5" sx={{ color: '#A855F7', fontWeight: 800 }}>
                       {selectedVulnerability.systemCount || 0}
                     </Typography>
                   </Box>
@@ -794,20 +758,20 @@ function AllVulnerabilitiesPage({ user }) {
                         <Paper sx={{ 
                           px: 2.5, 
                           py: 1.2,
-                          background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-                          border: '2px solid #3498DB',
+                          background: '#ffffff',
+                          border: '2px solid #A855F7',
                           borderRadius: 2,
                           transition: 'all 0.25s ease',
                           cursor: 'pointer',
                           '&:hover': {
-                            background: 'linear-gradient(135deg, #3498DB 0%, #2980b9 100%)',
+                            background: 'linear-gradient(135deg, #A855F7 0%, #7C3AED 100%)',
                             transform: 'translateY(-3px)',
-                            boxShadow: '0 6px 20px rgba(52, 152, 219, 0.35)',
+                            boxShadow: '0 6px 20px rgba(168, 85, 247, 0.35)',
                             '& .MuiTypography-root': { color: '#ffffff' }
                           }
                         }}>
                           <Typography variant="body2" sx={{ 
-                            color: '#3498DB',
+                            color: '#A855F7',
                             fontWeight: 700,
                             transition: 'color 0.25s ease'
                           }}>
@@ -827,8 +791,8 @@ function AllVulnerabilitiesPage({ user }) {
                 </Typography>
                 <Paper sx={{ 
                   p: 3, 
-                  background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-                  border: '1px solid #e8e8e8',
+                  background: '#ffffff',
+                  border: `1px solid ${APP_BORDER_BLUE}`,
                   borderRadius: 3,
                   boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.03)'
                 }}>
@@ -850,23 +814,25 @@ function AllVulnerabilitiesPage({ user }) {
         <DialogActions sx={{ 
           p: 3, 
           direction: 'rtl',
-          background: '#f8f9fa',
-          borderTop: '1px solid #e8e8e8'
+          background: '#ffffff',
+          borderTop: `1px solid ${APP_BORDER_BLUE}`
         }}>
           <Button 
             onClick={handleCloseDialog}
             variant="contained"
             sx={{
-              background: 'linear-gradient(135deg, #3498DB 0%, #2980b9 100%)',
+              background: '#A855F7',
+              backgroundImage: 'none',
               color: 'white',
               px: 5,
               py: 1.3,
               borderRadius: 2,
               fontWeight: 700,
-              boxShadow: '0 4px 15px rgba(52, 152, 219, 0.3)',
+              boxShadow: '0 2px 10px rgba(168, 85, 247, 0.25)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #2980b9 0%, #1f6fa5 100%)',
-                boxShadow: '0 6px 20px rgba(52, 152, 219, 0.4)',
+                background: '#7C3AED',
+                backgroundImage: 'none',
+                boxShadow: '0 6px 20px rgba(168, 85, 247, 0.3)',
                 transform: 'translateY(-2px)'
               },
               transition: 'all 0.25s ease-in-out'

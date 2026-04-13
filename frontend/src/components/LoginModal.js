@@ -11,7 +11,6 @@ import {
   Alert,
   IconButton,
   InputAdornment,
-  Paper,
   CircularProgress,
   Link
 } from '@mui/material';
@@ -23,6 +22,11 @@ import {
   Email as EmailIcon,
   ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
+import {
+  APP_ACCENT_GLOW_STRONG,
+  APP_PRIMARY_BLUE,
+  APP_PRIMARY_BLUE_DARK,
+} from '../themeTokens';
 
 function LoginModal({ open, onClose, onLogin, mandatory = false }) {
   const [mode, setMode] = useState('login'); // 'login', 'forgot', 'reset'
@@ -259,10 +263,10 @@ function LoginModal({ open, onClose, onLogin, mandatory = false }) {
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
               borderRadius: 2,
               '& fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.3)',
+                borderColor: 'rgba(168, 85, 247, 0.3)',
               },
               '&:hover fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.5)',
+                borderColor: 'rgba(168, 85, 247, 0.5)',
               },
               '&.Mui-focused fieldset': {
                 borderColor: 'primary.main',
@@ -321,10 +325,10 @@ function LoginModal({ open, onClose, onLogin, mandatory = false }) {
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
               borderRadius: 2,
               '& fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.3)',
+                borderColor: 'rgba(168, 85, 247, 0.3)',
               },
               '&:hover fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.5)',
+                borderColor: 'rgba(168, 85, 247, 0.5)',
               },
               '&.Mui-focused fieldset': {
                 borderColor: 'primary.main',
@@ -401,10 +405,10 @@ function LoginModal({ open, onClose, onLogin, mandatory = false }) {
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
               borderRadius: 2,
               '& fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.3)',
+                borderColor: 'rgba(168, 85, 247, 0.3)',
               },
               '&:hover fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.5)',
+                borderColor: 'rgba(168, 85, 247, 0.5)',
               },
               '&.Mui-focused fieldset': {
                 borderColor: 'primary.main',
@@ -478,10 +482,10 @@ function LoginModal({ open, onClose, onLogin, mandatory = false }) {
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
               borderRadius: 2,
               '& fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.3)',
+                borderColor: 'rgba(168, 85, 247, 0.3)',
               },
               '&:hover fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.5)',
+                borderColor: 'rgba(168, 85, 247, 0.5)',
               },
               '&.Mui-focused fieldset': {
                 borderColor: 'primary.main',
@@ -540,10 +544,10 @@ function LoginModal({ open, onClose, onLogin, mandatory = false }) {
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
               borderRadius: 2,
               '& fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.3)',
+                borderColor: 'rgba(168, 85, 247, 0.3)',
               },
               '&:hover fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.5)',
+                borderColor: 'rgba(168, 85, 247, 0.5)',
               },
               '&.Mui-focused fieldset': {
                 borderColor: 'primary.main',
@@ -582,7 +586,7 @@ function LoginModal({ open, onClose, onLogin, mandatory = false }) {
             p: 2, 
             backgroundColor: 'rgba(255, 255, 255, 0.05)', 
             borderRadius: 2,
-            border: '1px solid rgba(59, 166, 212, 0.3)'
+            border: '1px solid rgba(168, 85, 247, 0.3)'
           }}>
             <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600, display: 'block', mb: 1 }}>
               דרישות הסיסמה:
@@ -639,10 +643,10 @@ function LoginModal({ open, onClose, onLogin, mandatory = false }) {
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
               borderRadius: 2,
               '& fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.3)',
+                borderColor: 'rgba(168, 85, 247, 0.3)',
               },
               '&:hover fieldset': {
-                borderColor: 'rgba(59, 166, 212, 0.5)',
+                borderColor: 'rgba(168, 85, 247, 0.5)',
               },
               '&.Mui-focused fieldset': {
                 borderColor: 'primary.main',
@@ -743,9 +747,9 @@ function LoginModal({ open, onClose, onLogin, mandatory = false }) {
       PaperProps={{
         sx: {
           borderRadius: 3,
-          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-          border: '1px solid rgba(59, 166, 212, 0.3)',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+          background: 'linear-gradient(160deg, #0f172a 0%, #1e293b 45%, #0f172a 100%)',
+          border: '1px solid rgba(168, 85, 247, 0.35)',
+          boxShadow: '0 24px 64px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(168, 85, 247, 0.12)',
         }
       }}
     >
@@ -847,14 +851,16 @@ function LoginModal({ open, onClose, onLogin, mandatory = false }) {
               borderRadius: 2,
               px: 4,
               py: 1.5,
-              background: 'linear-gradient(135deg, #2596be 0%, #3ba6d4 100%)',
-              boxShadow: '0 4px 12px rgba(37, 150, 190, 0.4)',
+              background: APP_PRIMARY_BLUE,
+              backgroundImage: 'none',
+              boxShadow: `0 2px 10px ${APP_ACCENT_GLOW_STRONG}`,
               '&:hover': {
-                background: 'linear-gradient(135deg, #1e7a9a 0%, #2596be 100%)',
-                boxShadow: '0 6px 16px rgba(37, 150, 190, 0.5)',
+                background: APP_PRIMARY_BLUE_DARK,
+                backgroundImage: 'none',
+                boxShadow: '0 6px 20px rgba(168, 85, 247, 0.35)',
               },
               '&:disabled': {
-                background: 'rgba(37, 150, 190, 0.3)',
+                background: 'rgba(168, 85, 247, 0.3)',
                 color: 'rgba(255, 255, 255, 0.5)',
               }
             }}

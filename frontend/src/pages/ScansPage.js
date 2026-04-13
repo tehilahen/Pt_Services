@@ -27,6 +27,19 @@ import {
   ChevronRight as ChevronRightIcon,
   ChevronLeft as ChevronLeftIcon
 } from '@mui/icons-material';
+import {
+  APP_BACKGROUND_DEFAULT,
+  APP_PRIMARY_BLUE,
+  APP_TEXT_PRIMARY,
+  APP_TEXT_SECONDARY,
+} from '../themeTokens';
+import {
+  tableContainerPaperSx,
+  tableHeadCellSortableSx,
+  tableHeadCellSx,
+  tableBodyRowSx,
+  tableStickyRtlSx
+} from '../tableStyles';
 
 function ScansPage({ user }) {
   const [scans, setScans] = useState([]);
@@ -71,8 +84,8 @@ function ScansPage({ user }) {
     switch (statusLower) {
       case 'completed': 
       case 'הצליח': 
-        return '#55c6c2'; // Teal instead of green
-      case 'running': return '#3498DB'; // Bright blue (consistent)
+        return '#059669';
+      case 'running': return '#A855F7';
       case 'pending': 
       case 'מתחיל': 
         return '#f77f3c'; // Orange instead of yellow
@@ -179,7 +192,7 @@ function ScansPage({ user }) {
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
           <CircularProgress size={60} 
           sx={{
-            color: '#3498DB', // Bright blue for loading indicator
+            color: '#A855F7', // Bright blue for loading indicator
             '& .MuiCircularProgress-circle': {
               strokeLinecap: 'round',
             }
@@ -196,30 +209,7 @@ function ScansPage({ user }) {
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      background: '#f8f9fa',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(52, 152, 219, 0.03)',
-        pointerEvents: 'none',
-        zIndex: 0
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(138, 43, 226, 0.02)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }
+      background: APP_BACKGROUND_DEFAULT,
     }}>
       <Container maxWidth="xl" sx={{ py: 3, position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ mb: 3 }}>
@@ -231,14 +221,14 @@ function ScansPage({ user }) {
             alignItems: 'center', 
             gap: 2,
             mb: 1,
-            color: '#2c3e50'
+            color: APP_TEXT_PRIMARY
           }}
         >
-          <SecurityIcon sx={{ fontSize: 40, color: '#3498DB' }} />
+          <SecurityIcon sx={{ fontSize: 40, color: '#A855F7' }} />
           סריקות אבטחה
         </Typography>
         <Typography variant="body1" 
-          sx={{ color: '#34495e' }}> 
+          sx={{ color: APP_TEXT_SECONDARY }}> 
           מציג את כל הסריקות שבוצעו במערכת
         </Typography>
       </Box>
@@ -257,30 +247,14 @@ function ScansPage({ user }) {
         </Alert>
       )}
 
-      <TableContainer component={Paper} sx={{
-        background: '#ffffff',
-        border: '1px solid #e0e0e0',
-        borderRadius: '16px',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-        direction: 'rtl'
-      }}>
-          <Table stickyHeader aria-label="scans table" sx={{ direction: 'rtl' }}>
+      <TableContainer component={Paper} sx={tableContainerPaperSx}>
+          <Table stickyHeader aria-label="scans table" sx={tableStickyRtlSx}>
             <TableHead>
               <TableRow>
                 <TableCell 
                   align="right" 
                   onClick={handleSortByName}
-                  sx={{ 
-                    fontWeight: 700, 
-                    color: '#ffffff', 
-                    backgroundColor: '#3498DB', 
-                    borderBottom: 'none', 
-                    fontSize: '0.95rem', 
-                    py: 1.5,
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s',
-                    '&:hover': { backgroundColor: '#2980b9' }
-                  }}
+                  sx={tableHeadCellSortableSx}
                 > 
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-start' }}> 
                     <ComputerIcon sx={{ fontSize: 18 }} />
@@ -295,17 +269,7 @@ function ScansPage({ user }) {
                 <TableCell 
                   align="right" 
                   onClick={handleSortByDate}
-                  sx={{ 
-                    fontWeight: 700, 
-                    color: '#ffffff', 
-                    backgroundColor: '#3498DB', 
-                    borderBottom: 'none', 
-                    fontSize: '0.95rem', 
-                    py: 1.5,
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s',
-                    '&:hover': { backgroundColor: '#2980b9' }
-                  }}
+                  sx={tableHeadCellSortableSx}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-start' }}>
                     <ScheduleIcon sx={{ fontSize: 18 }} />
@@ -317,22 +281,22 @@ function ScansPage({ user }) {
                     )}
                   </Box>
                 </TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.9rem', py: 1.5 }}>סטטוס</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.9rem', py: 1.5 }}>משך זמן</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.9rem', py: 1.5 }}>
+                <TableCell align="right" sx={tableHeadCellSx}>סטטוס</TableCell>
+                <TableCell align="right" sx={tableHeadCellSx}>משך זמן</TableCell>
+                <TableCell align="right" sx={tableHeadCellSx}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'flex-start' }}>
                     <BugIcon sx={{ fontSize: 20 }} />
                     ממצאים
                   </Box>
                 </TableCell>
-                <TableCell align="center" sx={{ backgroundColor: '#3498DB', borderBottom: 'none', width: '60px', py: 1.5 }}></TableCell>
+                <TableCell align="center" sx={{ ...tableHeadCellSx, width: '60px' }}></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {sortedScans.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} align="center" sx={{ py: 4, backgroundColor: '#ffffff' }}>
-                    <Typography variant="body1" sx={{ color: '#2c3e50', fontWeight: 500 }}> 
+                    <Typography variant="body1" sx={{ color: APP_TEXT_PRIMARY, fontWeight: 500 }}> 
                       לא נמצאו סריקות במערכת
                     </Typography>
                   </TableCell>
@@ -343,13 +307,7 @@ function ScansPage({ user }) {
                   .map((scan) => (
                   <TableRow 
                     key={scan.id}
-                    sx={{
-                      cursor: 'pointer',
-                      backgroundColor: '#ffffff',
-                      '&:hover': { backgroundColor: '#f5f8ff' },
-                      borderBottom: '1px solid #f0f0f0',
-                      transition: 'background-color 0.2s ease',
-                    }}
+                    sx={{ ...tableBodyRowSx, cursor: 'pointer' }}
                     onClick={() => handleViewVulnerabilities(scan.system_id)}
                   >
                     <TableCell align="right" sx={{ py: 1.5 }}>
@@ -483,9 +441,9 @@ function ScansPage({ user }) {
                       <IconButton
                         size="small"
                         sx={{ 
-                          color: '#3498DB',
+                          color: '#A855F7',
                           '&:hover': {
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            backgroundColor: 'rgba(168, 85, 247, 0.1)',
                           }
                         }}
                         onClick={(e) => {
@@ -519,15 +477,15 @@ function ScansPage({ user }) {
                 onClick={() => setPage(page - 1)}
                 startIcon={<ChevronRightIcon />}
                 sx={{
-                  color: '#3498DB',
-                  borderColor: '#3498DB',
-                  '&:hover': { borderColor: '#2980b9', backgroundColor: 'rgba(52, 152, 219, 0.08)' }
+                  color: '#A855F7',
+                  borderColor: APP_PRIMARY_BLUE,
+                  '&:hover': { borderColor: '#7C3AED', backgroundColor: 'rgba(168, 85, 247, 0.08)' }
                 }}
               >
                 הקודם
               </Button>
             )}
-            <Typography sx={{ color: '#2c3e50', fontWeight: 600, fontSize: '0.95rem' }}>
+            <Typography sx={{ color: APP_TEXT_PRIMARY, fontWeight: 600, fontSize: '0.95rem' }}>
               עמוד {page + 1} מתוך {Math.ceil(sortedScans.length / rowsPerPage)}
             </Typography>
             {page < Math.ceil(sortedScans.length / rowsPerPage) - 1 && (
@@ -537,9 +495,9 @@ function ScansPage({ user }) {
                 onClick={() => setPage(page + 1)}
                 endIcon={<ChevronLeftIcon />}
                 sx={{
-                  color: '#3498DB',
-                  borderColor: '#3498DB',
-                  '&:hover': { borderColor: '#2980b9', backgroundColor: 'rgba(52, 152, 219, 0.08)' }
+                  color: '#A855F7',
+                  borderColor: APP_PRIMARY_BLUE,
+                  '&:hover': { borderColor: '#7C3AED', backgroundColor: 'rgba(168, 85, 247, 0.08)' }
                 }}
               >
                 הבא
@@ -561,19 +519,19 @@ function ScansPage({ user }) {
             px: 2,
             py: 1,
             borderRadius: 2,
-            backgroundColor: 'rgba(52, 152, 219, 0.08)',
-            border: '1px solid rgba(52, 152, 219, 0.2)'
+            backgroundColor: 'rgba(168, 85, 247, 0.08)',
+            border: '1px solid rgba(168, 85, 247, 0.2)'
           }}>
-            <SecurityIcon sx={{ color: '#3498DB', fontSize: 18 }} />
+            <SecurityIcon sx={{ color: '#A855F7', fontSize: 18 }} />
             <Typography 
               variant="body2" 
               sx={{ 
-                color: '#2c3e50', 
+                color: APP_TEXT_PRIMARY, 
                 fontWeight: 600, 
                 fontSize: '0.9rem'
               }}
             >
-              סה״כ <span style={{ color: '#3498DB', fontWeight: 700 }}>{scans.length}</span> סריקות נמצאו במערכת
+              סה״כ <span style={{ color: '#A855F7', fontWeight: 700 }}>{scans.length}</span> סריקות נמצאו במערכת
             </Typography>
           </Box>
         </Box>

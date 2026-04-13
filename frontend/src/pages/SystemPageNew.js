@@ -31,6 +31,13 @@ import {
   Fade
 } from '@mui/material';
 import {
+  tableContainerPaperSx,
+  tableBodyRowSx,
+  tableScrollbarSx,
+  tableHeadCellStickySx,
+  tableStickyRtlSx
+} from '../tableStyles';
+import {
   ArrowForward as ArrowBackIcon,
   Security as SecurityIcon,
   Computer as ComputerIcon,
@@ -194,7 +201,7 @@ function SystemPageNew() {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="50vh">
           <CircularProgress size={60} sx={{ mb: 3,
-            color: '#3498DB', // Bright blue for loading indicator
+            color: '#A855F7', // Bright blue for loading indicator
             '& .MuiCircularProgress-circle': {
               strokeLinecap: 'round',
             }
@@ -229,9 +236,9 @@ function SystemPageNew() {
             variant="contained"
             onClick={() => navigate('/')}
             sx={{ 
-              backgroundColor: '#3498DB',
+              backgroundColor: '#A855F7',
               color: 'white',
-              '&:hover': { backgroundColor: '#55c6c2' }
+              '&:hover': { backgroundColor: '#A855F7' }
             }}
             startIcon={<ArrowBackIcon sx={{ color: 'white' }} />}
           >
@@ -276,31 +283,7 @@ function SystemPageNew() {
       height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      background: '#f8f9fa',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(52, 152, 219, 0.03)',
-        pointerEvents: 'none',
-        
-        zIndex: 0
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(138, 43, 226, 0.02)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }
+      background: '#ffffff',
     }}>
       <Container maxWidth="xl" sx={{ py: 3, px: { xs: 1, sm: 2, md: 3 }, position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
@@ -346,7 +329,7 @@ function SystemPageNew() {
                   aria-label="פרטי מערכת"
                 >
                   <Box display="flex" alignItems="center" gap={1}>
-                    <ComputerIcon sx={{ fontSize: 32, color: '#3498DB' }} aria-hidden="true" />
+                    <ComputerIcon sx={{ fontSize: 32, color: '#A855F7' }} aria-hidden="true" />
                     <Typography variant="h4" fontWeight="bold" sx={{ color: '#2c3e50' }}>
                       {system?.name}
                     </Typography>
@@ -354,7 +337,7 @@ function SystemPageNew() {
 
                   {lastScanDate && (
                     <Box display="flex" alignItems="center" gap={1} sx={{ mt: '10px' }}>
-                      <ScheduleIcon sx={{ color: '#3498DB', fontSize: 26 }} aria-hidden="true" />
+                      <ScheduleIcon sx={{ color: '#A855F7', fontSize: 26 }} aria-hidden="true" />
                       <Typography variant="h5" sx={{ color: '#2c3e50', fontWeight: 600 }}>
                         סריקה אחרונה: {new Date(lastScanDate).toLocaleDateString('he-IL', {
                           day: 'numeric',
@@ -380,7 +363,7 @@ function SystemPageNew() {
                     p: 1.5, 
                     height: '100%',
                     borderRadius: 2,
-                    border: '1px solid rgba(52, 152, 219, 0.2)',
+                    border: '1px solid rgba(168, 85, 247, 0.2)',
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
                     direction: 'rtl',
                     display: 'flex',
@@ -422,7 +405,7 @@ function SystemPageNew() {
                               borderRadius: 4,
                               background: percentage === 100 
                                 ? 'linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)'
-                                : 'linear-gradient(135deg, #3498db 0%, #55c6c2 100%)'
+                                : 'linear-gradient(135deg, #A855F7 0%, #A855F7 100%)'
                             }
                           }}
                           aria-label={`התקדמות הטיפול: ${percentage}%`}
@@ -446,7 +429,7 @@ function SystemPageNew() {
                     p: 1, 
                     height: '100%',
                     borderRadius: 2,
-                    border: '1px solid rgba(52, 152, 219, 0.2)',
+                    border: '1px solid rgba(168, 85, 247, 0.2)',
                     backgroundColor: 'rgba(255, 255, 255, 0.95)',
                     direction: 'rtl',
                     display: 'flex',
@@ -572,86 +555,40 @@ function SystemPageNew() {
         <Paper 
           elevation={0}
           sx={{
-            borderRadius: 3,
-            border: '1px solid rgba(52, 152, 219, 0.2)',
+            ...tableContainerPaperSx,
             overflow: 'hidden'
           }}
         >
-          <Table aria-label="טבלת ממצאים של מערכת" sx={{ direction: 'rtl', tableLayout: 'fixed', width: '100%' }}>
+          <Table aria-label="טבלת ממצאים של מערכת" sx={{ ...tableStickyRtlSx, tableLayout: 'fixed', width: '100%' }}>
             <TableHead>
-              <TableRow sx={{ backgroundColor: 'rgb(98, 120, 141)' }}>
+              <TableRow>
                 <TableCell 
                   align="right"
-                  sx={{ 
-                    fontWeight: 700, 
-                    color: '#ffffff', 
-                    fontSize: '0.95rem',
-                    backgroundColor: 'rgb(98, 120, 141)',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 10,
-                    width: '120px'
-                  }}
+                  sx={tableHeadCellStickySx({ width: '120px' })}
                 >
                   חומרה
                 </TableCell>
                 <TableCell 
                   align="right"
-                  sx={{ 
-                    fontWeight: 700, 
-                    color: '#ffffff', 
-                    fontSize: '0.95rem',
-                    backgroundColor: 'rgb(98, 120, 141)',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 10,
-                    width: 'auto'
-                  }}
+                  sx={tableHeadCellStickySx({ width: 'auto' })}
                 >
                   תיאור
                 </TableCell>
                 <TableCell 
                   align="right"
-                  sx={{ 
-                    fontWeight: 700, 
-                    color: '#ffffff', 
-                    fontSize: '0.95rem',
-                    backgroundColor: 'rgb(98, 120, 141)',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 10,
-                    width: '200px'
-                  }}
+                  sx={tableHeadCellStickySx({ width: '200px' })}
                 >
                   המלצה לטיפול
                 </TableCell>
                 <TableCell 
                   align="right"
-                  sx={{ 
-                    fontWeight: 700, 
-                    color: '#ffffff', 
-                    fontSize: '0.95rem',
-                    backgroundColor: 'rgb(98, 120, 141)',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 10,
-                    width: '150px'
-                  }}
+                  sx={tableHeadCellStickySx({ width: '150px' })}
                 >
                   סטטוס
                 </TableCell>
                 <TableCell 
                   align="center"
-                  sx={{ 
-                    fontWeight: 700, 
-                    color: '#ffffff', 
-                    fontSize: '0.95rem',
-                    backgroundColor: 'rgb(98, 120, 141)',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 10,
-                    width: '100px'
-                  }}
+                  sx={tableHeadCellStickySx({ width: '100px' })}
                 >
                   פעולות
                 </TableCell>
@@ -663,26 +600,10 @@ function SystemPageNew() {
               maxHeight: 540,
               overflow: 'auto',
               direction: 'rtl',
-              '&::-webkit-scrollbar': {
-                width: '8px',
-                height: '8px'
-              },
-              '&::-webkit-scrollbar-track': {
-                backgroundColor: 'rgba(52, 152, 219, 0.05)',
-                borderRadius: '4px'
-              },
-              '&::-webkit-scrollbar-thumb': {
-                backgroundColor: 'rgba(52, 152, 219, 0.3)',
-                borderRadius: '4px',
-                '&:hover': {
-                  backgroundColor: 'rgba(52, 152, 219, 0.5)'
-                }
-              },
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(52, 152, 219, 0.3) rgba(52, 152, 219, 0.05)'
+              ...tableScrollbarSx
             }}
           >
-            <Table aria-label="טבלת ממצאים של מערכת - תוכן" sx={{ direction: 'rtl', tableLayout: 'fixed', width: '100%' }}>
+            <Table aria-label="טבלת ממצאים של מערכת - תוכן" sx={{ ...tableStickyRtlSx, tableLayout: 'fixed', width: '100%' }}>
             <TableBody>
               {vulnerabilities.length === 0 ? (
                 <TableRow>
@@ -700,23 +621,7 @@ function SystemPageNew() {
                   return (
                     <TableRow 
                       key={vuln.id || `${vuln.system_id}-${vuln.osvdb_id}`}
-                      sx={{
-                        backgroundColor: '#ffffff',
-                        transition: 'all 0.2s ease',
-                        borderBottom: '1px solid rgba(52, 152, 219, 0.1)',
-                        '&:hover': { 
-                          backgroundColor: '#7f8c8d',
-                          '& .MuiTableCell-root': {
-                            color: '#ffffff'
-                          },
-                          '& .MuiTypography-root': {
-                            color: '#ffffff !important'
-                          },
-                          '& .MuiIconButton-root': {
-                            color: '#ffffff'
-                          }
-                        },
-                      }}
+                      sx={tableBodyRowSx}
                     >
                       <TableCell align="right" sx={{ width: '120px', py: 2 }}>
                         <Box sx={{ 
@@ -765,12 +670,12 @@ function SystemPageNew() {
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
-                              color: '#3498DB',
+                              color: '#A855F7',
                               fontWeight: 500,
                               textDecoration: 'underline',
                               cursor: 'pointer',
                               '&:hover': {
-                                color: '#2980b9'
+                                color: '#7C3AED'
                               }
                             }}>
                             {vuln.recommendations}
@@ -795,10 +700,10 @@ function SystemPageNew() {
                               color: isHandled ? '#1e8449' : '#2c3e50',
                               fontWeight: 600,
                               '.MuiOutlinedInput-notchedOutline': { 
-                                borderColor: isHandled ? 'rgba(46, 204, 113, 0.5)' : 'rgba(52, 152, 219, 0.5)' 
+                                borderColor: isHandled ? 'rgba(46, 204, 113, 0.5)' : 'rgba(168, 85, 247, 0.5)' 
                               },
                               '&:hover .MuiOutlinedInput-notchedOutline': { 
-                                borderColor: isHandled ? '#27ae60' : '#3498DB' 
+                                borderColor: isHandled ? '#27ae60' : '#A855F7' 
                               },
                               '.MuiSvgIcon-root': { color: '#2c3e50' },
                               backgroundColor: isHandled ? 'rgba(46, 204, 113, 0.1)' : 'rgba(255, 255, 255, 0.9)',
@@ -815,7 +720,7 @@ function SystemPageNew() {
                         <IconButton 
                           size="small" 
                           onClick={() => handleOpenDialog(vuln)}
-                          sx={{ color: '#3498DB' }}
+                          sx={{ color: '#A855F7' }}
                           aria-label="הצג פרטים מלאים"
                         >
                           <VisibilityIcon fontSize="small" />
@@ -840,7 +745,7 @@ function SystemPageNew() {
         sx={{
           '& .MuiDialog-paper': {
             borderRadius: 3,
-            border: '1px solid rgba(52, 152, 219, 0.3)',
+            border: '1px solid rgba(168, 85, 247, 0.3)',
             backgroundColor: '#ffffff'
           }
         }}
@@ -893,7 +798,7 @@ function SystemPageNew() {
                 <Paper sx={{ 
                   p: 2, 
                   bgcolor: '#f8f9fa',
-                  border: '1px solid rgba(52, 152, 219, 0.2)',
+                  border: '1px solid rgba(168, 85, 247, 0.2)',
                   borderRadius: 2
                 }}>
                   <Typography variant="body1" sx={{ 
@@ -914,7 +819,7 @@ function SystemPageNew() {
                 <Paper sx={{ 
                   p: 2, 
                   bgcolor: '#f8f9fa',
-                  border: '1px solid rgba(52, 152, 219, 0.2)',
+                  border: '1px solid rgba(168, 85, 247, 0.2)',
                   borderRadius: 2
                 }}>
                   {selectedVulnerability.recommendations ? (
@@ -925,13 +830,13 @@ function SystemPageNew() {
                       target="_blank"
                       rel="noopener noreferrer"
                       sx={{ 
-                        color: '#3498DB',
+                        color: '#A855F7',
                         textDecoration: 'underline',
                         cursor: 'pointer',
                         wordBreak: 'break-word',
                         display: 'block',
                         '&:hover': {
-                          color: '#2980b9'
+                          color: '#7C3AED'
                         }
                       }}
                     >
@@ -966,12 +871,12 @@ function SystemPageNew() {
                       '.MuiOutlinedInput-notchedOutline': { 
                         borderColor: (vulnerabilityStatuses[selectedVulnerability.id || `${selectedVulnerability.system_id}-${selectedVulnerability.osvdb_id}`] === 'טופל' || 
                                      vulnerabilityStatuses[selectedVulnerability.id || `${selectedVulnerability.system_id}-${selectedVulnerability.osvdb_id}`] === 'סגור')
-                          ? 'rgba(46, 204, 113, 0.5)' : 'rgba(52, 152, 219, 0.5)' 
+                          ? 'rgba(46, 204, 113, 0.5)' : 'rgba(168, 85, 247, 0.5)' 
                       },
                       '&:hover .MuiOutlinedInput-notchedOutline': { 
                         borderColor: (vulnerabilityStatuses[selectedVulnerability.id || `${selectedVulnerability.system_id}-${selectedVulnerability.osvdb_id}`] === 'טופל' || 
                                      vulnerabilityStatuses[selectedVulnerability.id || `${selectedVulnerability.system_id}-${selectedVulnerability.osvdb_id}`] === 'סגור')
-                          ? '#27ae60' : '#3498DB' 
+                          ? '#27ae60' : '#A855F7' 
                       },
                       '.MuiSvgIcon-root': { color: '#2c3e50' },
                       backgroundColor: (vulnerabilityStatuses[selectedVulnerability.id || `${selectedVulnerability.system_id}-${selectedVulnerability.osvdb_id}`] === 'טופל' || 

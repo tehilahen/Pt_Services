@@ -40,6 +40,14 @@ import {
   FilterList as FilterListIcon
 } from '@mui/icons-material';
 import axios from 'axios';
+import {
+  tableContainerPaperSx,
+  tableHeadCellSx,
+  tableHeadCellSortableSx,
+  tableBodyRowSx,
+  tableScrollbarSx,
+  tableStickyRtlSx
+} from '../tableStyles';
 
 const STATUS_OPTIONS = [
   { value: 'הכנה', label: 'הכנה' },
@@ -223,7 +231,7 @@ function ManualPTTrackingPage({ user }) {
   const getStatusColor = (status) => {
     switch (status) {
       case 'הכנה': return { bg: 'rgba(247, 127, 60, 0.15)', color: '#f77f3c' };
-      case 'התנעה': return { bg: 'rgba(52, 152, 219, 0.15)', color: '#3498DB' };
+      case 'התנעה': return { bg: 'rgba(168, 85, 247, 0.15)', color: '#A855F7' };
       case 'בבדיקה': return { bg: 'rgba(255, 193, 7, 0.2)', color: '#d97706' };
       case 'הסתיים': return { bg: 'rgba(46, 204, 113, 0.15)', color: '#27ae60' };
       default: return { bg: 'rgba(128, 128, 128, 0.15)', color: '#7f8c8d' };
@@ -274,17 +282,6 @@ function ManualPTTrackingPage({ user }) {
     if (column === 'status') setFilterStatus('all');
   };
 
-  const headerCellSx = {
-    fontWeight: 700,
-    color: '#ffffff',
-    backgroundColor: '#3498DB',
-    borderBottom: 'none',
-    fontSize: '0.95rem',
-    py: 2,
-    cursor: 'pointer',
-    '&:hover': { backgroundColor: '#2980b9' }
-  };
-
   const filteredItems = items.filter((row) => {
     const term = searchTerm.trim().toLowerCase();
     const matchesSearch = !term ||
@@ -315,8 +312,8 @@ function ManualPTTrackingPage({ user }) {
           startIcon={<AddIcon />}
           onClick={handleAdd}
           sx={{
-            backgroundColor: '#3498DB',
-            '&:hover': { backgroundColor: '#2980b9' }
+            backgroundColor: '#A855F7',
+            '&:hover': { backgroundColor: '#7C3AED' }
           }}
         >
           הוספת מעקב
@@ -336,30 +333,26 @@ function ManualPTTrackingPage({ user }) {
 
       <Paper
         sx={{
-          borderRadius: 2,
-          overflow: 'hidden',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-          border: '1px solid #e0e0e0'
+          ...tableContainerPaperSx,
+          overflow: 'hidden'
         }}
       >
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-            <CircularProgress sx={{ color: '#3498DB' }} />
+            <CircularProgress sx={{ color: '#A855F7' }} />
           </Box>
         ) : (
           <TableContainer
             sx={{
               maxHeight: 'calc(100vh - 280px)',
-              '&::-webkit-scrollbar': { width: 8, height: 8 },
-              '&::-webkit-scrollbar-track': { backgroundColor: 'rgba(52, 152, 219, 0.05)', borderRadius: 1 },
-              '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(52, 152, 219, 0.3)', borderRadius: 1 }
+              ...tableScrollbarSx
             }}
           >
-            <Table stickyHeader>
+            <Table stickyHeader sx={tableStickyRtlSx}>
               <TableHead>
                 <TableRow>
                   <TableCell
-                    sx={headerCellSx}
+                    sx={tableHeadCellSortableSx}
                     onClick={(e) => handleOpenFilter(e, 'system_name')}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5 }}>
@@ -371,7 +364,7 @@ function ManualPTTrackingPage({ user }) {
                     </Box>
                   </TableCell>
                   <TableCell
-                    sx={headerCellSx}
+                    sx={tableHeadCellSortableSx}
                     onClick={(e) => handleOpenFilter(e, 'last_pt')}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5 }}>
@@ -383,7 +376,7 @@ function ManualPTTrackingPage({ user }) {
                     </Box>
                   </TableCell>
                   <TableCell
-                    sx={headerCellSx}
+                    sx={tableHeadCellSortableSx}
                     onClick={(e) => handleOpenFilter(e, 'next_check')}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5 }}>
@@ -394,10 +387,10 @@ function ManualPTTrackingPage({ user }) {
                       </Box>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>מנהלי מערכת</TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>רמת רגישות</TableCell>
+                  <TableCell sx={tableHeadCellSx}>מנהלי מערכת</TableCell>
+                  <TableCell sx={tableHeadCellSx}>רמת רגישות</TableCell>
                   <TableCell
-                    sx={headerCellSx}
+                    sx={tableHeadCellSortableSx}
                     onClick={(e) => handleOpenFilter(e, 'status')}
                   >
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 0.5 }}>
@@ -408,7 +401,7 @@ function ManualPTTrackingPage({ user }) {
                       </Box>
                     </Box>
                   </TableCell>
-                  <TableCell sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2, textAlign: 'center' }}>
+                  <TableCell sx={{ ...tableHeadCellSx, textAlign: 'center' }}>
                     <Typography variant="caption" component="span" sx={{ opacity: 0.9 }}>{filteredItems.length} / {items.length}</Typography>
                   </TableCell>
                 </TableRow>
@@ -428,15 +421,11 @@ function ManualPTTrackingPage({ user }) {
                     return (
                       <TableRow
                         key={row.id}
-                        sx={{
-                          backgroundColor: '#ffffff',
-                          '&:hover': { backgroundColor: '#f5f8ff' },
-                          borderBottom: '1px solid #f0f0f0'
-                        }}
+                        sx={tableBodyRowSx}
                       >
                         <TableCell sx={{ py: 2 }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <AssignmentIcon sx={{ color: '#3498db', fontSize: 20 }} />
+                            <AssignmentIcon sx={{ color: '#A855F7', fontSize: 20 }} />
                             <Typography fontWeight={600} sx={{ color: '#1a252f' }}>{row.system_name}</Typography>
                           </Box>
                         </TableCell>
@@ -464,7 +453,7 @@ function ManualPTTrackingPage({ user }) {
                         <TableCell sx={{ py: 2 }}>
                           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.5 }}>
                             <Tooltip title="עריכה">
-                              <IconButton size="small" onClick={() => handleEdit(row)} sx={{ color: '#3498db' }}>
+                              <IconButton size="small" onClick={() => handleEdit(row)} sx={{ color: '#A855F7' }}>
                                 <EditIcon fontSize="small" />
                               </IconButton>
                             </Tooltip>
@@ -732,7 +721,7 @@ function ManualPTTrackingPage({ user }) {
           <Button onClick={() => setOpenDialog(false)} sx={{ color: '#2c3e50' }}>
             ביטול
           </Button>
-          <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#3498DB', '&:hover': { backgroundColor: '#2980b9' } }}>
+          <Button variant="contained" onClick={handleSave} sx={{ backgroundColor: '#A855F7', '&:hover': { backgroundColor: '#7C3AED' } }}>
             שמירה
           </Button>
         </DialogActions>

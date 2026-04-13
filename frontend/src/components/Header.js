@@ -15,10 +15,19 @@ import {
 } from '@mui/material';
 import { 
   Security as SecurityIcon,
-  Login as LoginIcon,
   Logout as LogoutIcon,
   Person as PersonIcon
 } from '@mui/icons-material';
+import {
+  APP_ACCENT_LIGHT,
+  APP_ACCENT_SURFACE,
+  APP_BACKGROUND_DEFAULT,
+  APP_BACKGROUND_PAPER,
+  APP_BORDER_BLUE_SOFT,
+  APP_PRIMARY_BLUE,
+  APP_TEXT_PRIMARY,
+  APP_TEXT_SECONDARY,
+} from '../themeTokens';
 
 function Header({ user, onLogout }) {
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
@@ -54,12 +63,10 @@ function Header({ user, onLogout }) {
         position="static" 
         elevation={0}
         sx={{ 
-          background: 'linear-gradient(135deg, #0e2747 0%, #091a33 100%)',
-          borderBottom: '1px solid rgba(52, 152, 219, 0.3)',
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+          background: `linear-gradient(180deg, ${APP_BACKGROUND_PAPER} 0%, ${APP_BACKGROUND_DEFAULT} 100%)`,
+          borderBottom: `1px solid ${APP_BORDER_BLUE_SOFT}`,
+          boxShadow: '0 1px 0 rgba(15, 23, 42, 0.06)',
           borderRadius: 0,
-          position: 'relative',
         }}
       >
         <Container maxWidth="xl">
@@ -88,8 +95,8 @@ function Header({ user, onLogout }) {
                 mr: 2.5, 
                 ml: 1,
                 fontSize: 36,
-                color: '#3498DB',
-                filter: 'drop-shadow(0 2px 4px rgba(52, 152, 219, 0.4))',
+                color: APP_PRIMARY_BLUE,
+                filter: 'drop-shadow(0 0 8px rgba(168, 85, 247, 0.35))',
                 animation: 'pulse 2s infinite'
               }} />
               <Box>
@@ -99,8 +106,7 @@ function Header({ user, onLogout }) {
                   sx={{ 
                     fontWeight: 'bold',
                     fontSize: '1.5rem',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
-                    color: '#ffffff',
+                    color: APP_TEXT_PRIMARY,
                     lineHeight: 1.2
                   }}
                 >
@@ -110,7 +116,7 @@ function Header({ user, onLogout }) {
                   variant="caption" 
                   component="div" 
                   sx={{ 
-                    color: 'rgba(255, 255, 255, 0.7)',
+                    color: APP_TEXT_SECONDARY,
                     fontSize: '0.75rem',
                     fontWeight: 500
                   }}
@@ -131,18 +137,17 @@ function Header({ user, onLogout }) {
                   px: 2.5,
                   py: 0.9,
                   borderRadius: 2,
-                  color: '#ffffff',
-                  backgroundColor: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(85, 198, 194, 0.6)',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+                  color: APP_PRIMARY_BLUE,
+                  backgroundColor: APP_ACCENT_SURFACE,
+                  border: `1px solid ${APP_BORDER_BLUE_SOFT}`,
                   textTransform: 'none',
                   fontWeight: 700,
                   letterSpacing: '0.3px',
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    backgroundColor: 'rgba(255,255,255,0.14)',
-                    borderColor: 'rgba(85, 198, 194, 0.8)',
-                    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.32)'
+                    backgroundColor: APP_ACCENT_LIGHT,
+                    borderColor: APP_PRIMARY_BLUE,
+                    boxShadow: `0 0 0 1px rgba(168, 85, 247, 0.2)`,
                   },
                   '&:active': {
                     transform: 'translateY(0) scale(0.99)'
@@ -162,11 +167,11 @@ function Header({ user, onLogout }) {
                     label={user.full_name || user.username}
                     onClick={handleUserMenuOpen}
                     sx={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      color: 'white',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      backgroundColor: APP_BACKGROUND_PAPER,
+                      color: APP_TEXT_PRIMARY,
+                      border: `1px solid ${APP_BORDER_BLUE_SOFT}`,
                       '&:hover': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                        backgroundColor: APP_BACKGROUND_DEFAULT,
                         cursor: 'pointer'
                       },
                       '& .MuiChip-label': {
@@ -181,11 +186,12 @@ function Header({ user, onLogout }) {
                     onClose={handleUserMenuClose}
                     PaperProps={{
                       sx: {
-                        backgroundColor: '#1e293b',
-                        border: '1px solid rgba(59, 166, 212, 0.3)',
+                        backgroundColor: '#ffffff',
+                        border: `1px solid ${APP_BORDER_BLUE_SOFT}`,
                         borderRadius: 2,
                         mt: 1,
-                        minWidth: 200
+                        minWidth: 200,
+                        boxShadow: '0 10px 40px rgba(15, 23, 42, 0.1)',
                       }
                     }}
                   >
@@ -193,17 +199,17 @@ function Header({ user, onLogout }) {
                       <Typography variant="subtitle2" sx={{ color: 'primary.main', fontWeight: 600 }}>
                         {user.full_name || user.username}
                       </Typography>
-                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                      <Typography variant="body2" sx={{ color: APP_TEXT_SECONDARY }}>
                         {user.email}
                       </Typography>
                     </Box>
-                    <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+                    <Divider sx={{ borderColor: APP_BORDER_BLUE_SOFT }} />
                     <MenuItem 
                       onClick={handleLogout}
                       sx={{ 
-                        color: 'rgba(255, 255, 255, 0.9)',
+                        color: APP_TEXT_PRIMARY,
                         '&:hover': {
-                          backgroundColor: 'rgba(244, 67, 54, 0.1)'
+                          backgroundColor: 'rgba(220, 38, 38, 0.06)'
                         }
                       }}
                     >

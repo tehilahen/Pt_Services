@@ -29,6 +29,14 @@ import {
   Search as SearchIcon
 } from '@mui/icons-material';
 import axios from 'axios';
+import {
+  APP_BACKGROUND_DEFAULT,
+  APP_BORDER_BLUE,
+  APP_PRIMARY_BLUE,
+  APP_ACCENT_DARK,
+  APP_TEXT_PRIMARY,
+  APP_TEXT_SECONDARY,
+} from '../themeTokens';
 
 // נתוני דמה למקרה שהשרת לא זמין
 const mockSystems = [
@@ -220,30 +228,7 @@ function HomePage({ user }) {
       height: 'fit-content',
       display: 'flex',
       flexDirection: 'column',
-      background: '#f8f9fa',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(52, 152, 219, 0.03)',
-        pointerEvents: 'none',
-        zIndex: 0
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(138, 43, 226, 0.02)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }
+      background: APP_BACKGROUND_DEFAULT,
     }}>
       <Container maxWidth="xl" sx={{ py: 2, position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       {/* Server Status Alert */}
@@ -280,7 +265,7 @@ function HomePage({ user }) {
               mb: 1,
               textAlign: 'center',
               fontWeight: 700,
-              color: '#2c3e50',
+              color: APP_TEXT_PRIMARY,
               letterSpacing: '-0.02em',
               position: 'relative',
               fontSize: '1.25rem',
@@ -292,7 +277,7 @@ function HomePage({ user }) {
                 transform: 'translateX(-50%)',
                 width: '70px',
                 height: '2px',
-                background: 'linear-gradient(90deg, #3498db, #55c6c2)',
+                background: `linear-gradient(90deg, ${APP_PRIMARY_BLUE}, ${APP_ACCENT_DARK})`,
                 borderRadius: 0,
               }
             }}
@@ -360,8 +345,8 @@ function HomePage({ user }) {
                               right: 0,
                               height: '2px',
                               background: isActive 
-                                ? 'linear-gradient(90deg, rgba(85,198,194,0.6), rgba(85,198,194,0.2), rgba(85,198,194,0.6))'
-                                : 'linear-gradient(90deg, rgba(85,198,194,0.35), rgba(85,198,194,0.12), rgba(85,198,194,0.35))',
+                                ? 'linear-gradient(90deg, rgba(168,85,247,0.55), rgba(168,85,247,0.2), rgba(168,85,247,0.55))'
+                                : 'linear-gradient(90deg, rgba(168,85,247,0.35), rgba(168,85,247,0.12), rgba(168,85,247,0.35))',
                               borderRadius: '20px 20px 0 0'
                             },
                             '&:hover': !system.isPlaceholder ? {
@@ -384,14 +369,14 @@ function HomePage({ user }) {
                           }}>
                             <ComputerIcon sx={{ 
                               fontSize: 44,
-                              color: '#55c6c2',
+                              color: APP_PRIMARY_BLUE,
                               filter: 'none',
                               flexShrink: 0
                             }} />
                             
                             <Typography variant="h6" sx={{ 
                               fontWeight: 700, 
-                              color: '#1a365d',
+                              color: APP_TEXT_PRIMARY,
                               fontSize: '1.15rem',
                               textAlign: 'center',
                               lineHeight: 1.2,
@@ -412,7 +397,7 @@ function HomePage({ user }) {
                             
                             {system.last_scan_date && (
                               <Typography variant="body2" sx={{ 
-                                color: '#7f8c8d',
+                                color: APP_TEXT_SECONDARY,
                                 fontSize: '0.85rem',
                                 textAlign: 'center',
                                 flexShrink: 0
@@ -432,18 +417,18 @@ function HomePage({ user }) {
                                 size="medium"
                                 sx={{ 
                                   bgcolor: isActive 
-                                    ? 'rgba(85, 198, 194, 0.2)'
-                                    : 'rgba(85, 198, 194, 0.12)',
-                                  color: '#55c6c2',
+                                    ? 'rgba(168, 85, 247, 0.14)'
+                                    : 'rgba(168, 85, 247, 0.08)',
+                                  color: APP_PRIMARY_BLUE,
                                   fontWeight: 700,
                                   fontSize: '1rem',
                                   height: 32,
-                                  border: `1px solid rgba(85, 198, 194, ${isActive ? 0.45 : 0.3})`,
+                                  border: `1px solid ${APP_BORDER_BLUE}`,
                                   boxShadow: `0 4px 12px rgba(0, 0, 0, ${isActive ? 0.10 : 0.06})`,
                                   backdropFilter: 'blur(10px)',
                                   textShadow: 'none',
                                   '&:hover': {
-                                    bgcolor: 'rgba(85, 198, 194, 0.28)',
+                                    bgcolor: 'rgba(168, 85, 247, 0.2)',
                                     transform: 'translateY(-1px)',
                                     boxShadow: '0 6px 16px rgba(0, 0, 0, 0.12)'
                                   },
@@ -476,14 +461,14 @@ function HomePage({ user }) {
                         height: 4,
                         borderRadius: '2px',
                         bgcolor: index === activeSystemIndex 
-                          ? '#55c6c2'
-                          : 'rgba(85, 198, 194, 0.35)',
+                          ? APP_PRIMARY_BLUE
+                          : 'rgba(168, 85, 247, 0.35)',
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
                         '&:hover': {
                           bgcolor: index === activeSystemIndex 
-                            ? '#55c6c2'
-                            : 'rgba(85, 198, 194, 0.6)',
+                            ? APP_PRIMARY_BLUE
+                            : 'rgba(168, 85, 247, 0.55)',
                         }
                       }}
                     />
@@ -492,8 +477,8 @@ function HomePage({ user }) {
               </Box>
             ) : (
               <Box sx={{ textAlign: 'center' }}>
-                <ComputerIcon sx={{ fontSize: 60, color: '#587e7c', mb: 2, opacity: 0.7 }} />
-                <Typography variant="h6" sx={{ color: '#074643', fontWeight: 600 }}>
+                <ComputerIcon sx={{ fontSize: 60, color: APP_TEXT_SECONDARY, mb: 2, opacity: 0.7 }} />
+                <Typography variant="h6" sx={{ color: APP_TEXT_PRIMARY, fontWeight: 600 }}>
                   אין מערכות זמינות לתצוגה
                 </Typography>
               </Box>
@@ -513,31 +498,30 @@ function HomePage({ user }) {
                   to="/systems"
                   sx={{ 
                     cursor: 'pointer',
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(52, 152, 219, 0.3)',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '16px',
+                    border: `1px solid ${APP_BORDER_BLUE}`,
+                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+                    transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     display: 'block',
                     position: 'relative',
                     overflow: 'hidden',
                     height: 140,
                     '&:hover': {
-                      borderColor: 'rgba(52, 152, 219, 0.5)',
-                      transform: 'translateY(-4px) scale(1.02)',
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      boxShadow: '0 12px 40px rgba(52, 152, 219, 0.2)',
+                      borderColor: APP_PRIMARY_BLUE,
+                      transform: 'translateY(-2px)',
+                      backgroundColor: '#ffffff',
+                      boxShadow: '0 8px 24px rgba(168, 85, 247, 0.12)',
                     }
                   }}
                 >
                   <Box sx={{ p: 2.5, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
-                    <ComputerIcon sx={{ fontSize: 32, color: '#3498DB', mb: 1.5 }} />
-                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1, color: '#2c3e50', fontSize: '2rem' }}>
+                    <ComputerIcon sx={{ fontSize: 32, color: APP_PRIMARY_BLUE, mb: 1.5 }} />
+                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1, color: APP_TEXT_PRIMARY, fontSize: '2rem' }}>
                       {stats?.systems?.total_systems || 0}
                     </Typography>
-                    <Typography variant="body1" sx={{ color: '#3498DB', fontWeight: 600, fontSize: '1rem' }}>
+                    <Typography variant="body1" sx={{ color: APP_PRIMARY_BLUE, fontWeight: 600, fontSize: '1rem' }}>
                       מערכות
                     </Typography>
                   </Box>
@@ -547,28 +531,27 @@ function HomePage({ user }) {
               <Grid item xs={12} sm={5} md={4}>
                 <Box 
                   sx={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '20px',
-                    border: '1px solid rgba(52, 152, 219, 0.3)',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '16px',
+                    border: `1px solid ${APP_BORDER_BLUE}`,
+                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+                    transition: 'all 0.2s ease',
                     display: 'block',
                     position: 'relative',
                     overflow: 'hidden',
                     height: 140,
                     '&:hover': {
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 12px 40px rgba(52, 152, 219, 0.2)',
+                      boxShadow: '0 8px 24px rgba(168, 85, 247, 0.1)',
                     }
                   }}
                 >
                   <Box sx={{ p: 2.5, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
                     <CheckCircleIcon sx={{ fontSize: 32, color: '#27ae60', mb: 1.5 }} />
-                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1, color: '#2c3e50', fontSize: '1.75rem' }}>
+                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 1, color: APP_TEXT_PRIMARY, fontSize: '1.75rem' }}>
                       {statusStats['טופל'] || 0}/{stats?.vulnerabilities?.total || 0}
                     </Typography>
-                    <Typography variant="body1" sx={{ color: '#3498DB', fontWeight: 600, fontSize: '1rem' }}>
+                    <Typography variant="body1" sx={{ color: APP_PRIMARY_BLUE, fontWeight: 600, fontSize: '1rem' }}>
                       ממצאים שטופלו
                     </Typography>
                   </Box>
@@ -591,30 +574,29 @@ function HomePage({ user }) {
                   to="/vulnerabilities/critical"
                   sx={{ 
                     cursor: 'pointer',
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '18px',
-                    border: '1px solid #55c6c2',
-                    boxShadow: '0 0 0 1px rgba(14, 39, 71, 0.14), 0 6px 20px rgba(14, 39, 71, 0.08)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    borderRadius: '14px',
+                    border: `1px solid ${APP_BORDER_BLUE}`,
+                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+                    transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     display: 'block',
                     position: 'relative',
                     overflow: 'hidden',
                     height: 130,
+                    backgroundColor: '#ffffff',
                     '&:hover': {
-                      boxShadow: '0 0 0 2px rgba(14, 39, 71, 0.22), 0 8px 28px rgba(14, 39, 71, 0.14)',
-                      transform: 'translateY(-4px) scale(1.02)',
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      boxShadow: '0 6px 16px rgba(168, 85, 247, 0.12)',
+                      transform: 'translateY(-2px)',
+                      backgroundColor: '#ffffff',
                     }
                   }}
                 >
                   <Box sx={{ p: 2, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
                     <WarningIcon sx={{ fontSize: 28, color: '#aa0a21', mb: 1 }} />
-                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 0.5, color: '#3498DB', fontSize: '2rem' }}>
+                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 0.5, color: APP_TEXT_PRIMARY, fontSize: '2rem' }}>
                       {stats?.vulnerabilities?.breakdown?.Critical || 0}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#3498DB', fontWeight: 600, fontSize: '0.9rem' }}>
+                    <Typography variant="body2" sx={{ color: APP_TEXT_SECONDARY, fontWeight: 600, fontSize: '0.9rem' }}>
                       קריטי
                     </Typography>
                   </Box>
@@ -627,30 +609,29 @@ function HomePage({ user }) {
                   to="/vulnerabilities/high"
                   sx={{ 
                     cursor: 'pointer',
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '18px',
-                    border: '1px solid #55c6c2',
-                    boxShadow: '0 0 0 1px rgba(14, 39, 71, 0.14), 0 6px 20px rgba(14, 39, 71, 0.08)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    borderRadius: '14px',
+                    border: `1px solid ${APP_BORDER_BLUE}`,
+                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+                    transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     display: 'block',
                     position: 'relative',
                     overflow: 'hidden',
                     height: 130,
+                    backgroundColor: '#ffffff',
                     '&:hover': {
-                      boxShadow: '0 0 0 2px rgba(14, 39, 71, 0.22), 0 8px 28px rgba(14, 39, 71, 0.14)',
-                      transform: 'translateY(-4px) scale(1.02)',
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      boxShadow: '0 6px 16px rgba(168, 85, 247, 0.12)',
+                      transform: 'translateY(-2px)',
+                      backgroundColor: '#ffffff',
                     }
                   }}
                 >
                   <Box sx={{ p: 2, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
                     <WarningIcon sx={{ fontSize: 28, color: '#f73c57', mb: 1 }} />
-                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 0.5, color: '#3498DB', fontSize: '2rem' }}>
+                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 0.5, color: APP_TEXT_PRIMARY, fontSize: '2rem' }}>
                       {stats?.vulnerabilities?.breakdown?.High || 0}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#3498DB', fontWeight: 600, fontSize: '0.9rem' }}>
+                    <Typography variant="body2" sx={{ color: APP_TEXT_SECONDARY, fontWeight: 600, fontSize: '0.9rem' }}>
                       גבוה
                     </Typography>
                   </Box>
@@ -663,30 +644,29 @@ function HomePage({ user }) {
                   to="/vulnerabilities/medium"
                   sx={{ 
                     cursor: 'pointer',
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '18px',
-                    border: '1px solid #55c6c2',
-                    boxShadow: '0 0 0 1px rgba(14, 39, 71, 0.14), 0 6px 20px rgba(14, 39, 71, 0.08)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    borderRadius: '14px',
+                    border: `1px solid ${APP_BORDER_BLUE}`,
+                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+                    transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     display: 'block',
                     position: 'relative',
                     overflow: 'hidden',
                     height: 130,
+                    backgroundColor: '#ffffff',
                     '&:hover': {
-                      boxShadow: '0 0 0 2px rgba(14, 39, 71, 0.22), 0 8px 28px rgba(14, 39, 71, 0.14)',
-                      transform: 'translateY(-4px) scale(1.02)',
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      boxShadow: '0 6px 16px rgba(168, 85, 247, 0.12)',
+                      transform: 'translateY(-2px)',
+                      backgroundColor: '#ffffff',
                     }
                   }}
                 >
                   <Box sx={{ p: 2, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
                     <WarningIcon sx={{ fontSize: 28, color: '#f77f3c', mb: 1 }} />
-                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 0.5, color: '#3498DB', fontSize: '2rem' }}>
+                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 0.5, color: APP_TEXT_PRIMARY, fontSize: '2rem' }}>
                       {stats?.vulnerabilities?.breakdown?.Medium || 0}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#3498DB', fontWeight: 600, fontSize: '0.9rem' }}>
+                    <Typography variant="body2" sx={{ color: APP_TEXT_SECONDARY, fontWeight: 600, fontSize: '0.9rem' }}>
                       בינוני
                     </Typography>
                   </Box>
@@ -699,30 +679,29 @@ function HomePage({ user }) {
                   to="/vulnerabilities/low"
                   sx={{ 
                     cursor: 'pointer',
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '18px',
-                    border: '1px solid #55c6c2',
-                    boxShadow: '0 0 0 1px rgba(14, 39, 71, 0.14), 0 6px 20px rgba(14, 39, 71, 0.08)',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    borderRadius: '14px',
+                    border: `1px solid ${APP_BORDER_BLUE}`,
+                    boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+                    transition: 'all 0.2s ease',
                     textDecoration: 'none',
                     display: 'block',
                     position: 'relative',
                     overflow: 'hidden',
                     height: 130,
+                    backgroundColor: '#ffffff',
                     '&:hover': {
-                      boxShadow: '0 0 0 2px rgba(14, 39, 71, 0.22), 0 8px 28px rgba(14, 39, 71, 0.14)',
-                      transform: 'translateY(-4px) scale(1.02)',
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      boxShadow: '0 6px 16px rgba(168, 85, 247, 0.12)',
+                      transform: 'translateY(-2px)',
+                      backgroundColor: '#ffffff',
                     }
                   }}
                 >
                   <Box sx={{ p: 2, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
                     <ReportProblemIcon sx={{ fontSize: 28, color: '#ffad00', mb: 1 }} />
-                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 0.5, color: '#3498DB', fontSize: '2rem' }}>
+                    <Typography variant="h4" component="div" sx={{ fontWeight: 700, mb: 0.5, color: APP_TEXT_PRIMARY, fontSize: '2rem' }}>
                       {stats?.vulnerabilities?.breakdown?.Low || 0}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#3498DB', fontWeight: 600, fontSize: '0.9rem' }}>
+                    <Typography variant="body2" sx={{ color: APP_TEXT_SECONDARY, fontWeight: 600, fontSize: '0.9rem' }}>
                       נמוך
                     </Typography>
                   </Box>

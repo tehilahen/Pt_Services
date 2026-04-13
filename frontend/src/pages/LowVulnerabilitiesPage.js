@@ -28,6 +28,13 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import axios from 'axios';
+import {
+  tableContainerPaperSx,
+  tableHeadCellSx,
+  tableBodyRowSx,
+  tableScrollbarSx,
+  tableStickyRtlSx
+} from '../tableStyles';
 
 function LowVulnerabilitiesPage({ user }) {
   const [vulnerabilities, setVulnerabilities] = useState([]);
@@ -110,30 +117,7 @@ function LowVulnerabilitiesPage({ user }) {
       height: 'fit-content',
       display: 'flex',
       flexDirection: 'column',
-      background: '#f8f9fa',
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(52, 152, 219, 0.03)',
-        pointerEvents: 'none',
-        zIndex: 0
-      },
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(138, 43, 226, 0.02)',
-        pointerEvents: 'none',
-        zIndex: 0
-      }
+      background: '#ffffff',
     }}>
       <Container maxWidth="xl" sx={{ py: 4, position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column' }}>
       <Fade in timeout={600}>
@@ -188,36 +172,16 @@ function LowVulnerabilitiesPage({ user }) {
             </Paper>
           ) : (
             <TableContainer component={Paper} sx={{
-              background: '#ffffff',
-              border: '1px solid #e0e0e0',
-              borderRadius: '16px',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+              ...tableContainerPaperSx,
+              ...tableScrollbarSx,
               maxHeight: 600,
-              direction: 'rtl',
-              overflow: 'auto',
-              '&::-webkit-scrollbar': {
-                width: '8px',
-                height: '8px'
-              },
-              '&::-webkit-scrollbar-track': {
-                backgroundColor: 'rgba(52, 152, 219, 0.05)',
-                borderRadius: '4px'
-              },
-              '&::-webkit-scrollbar-thumb': {
-                backgroundColor: 'rgba(52, 152, 219, 0.3)',
-                borderRadius: '4px',
-                '&:hover': {
-                  backgroundColor: 'rgba(52, 152, 219, 0.5)'
-                }
-              },
-              scrollbarWidth: 'thin',
-              scrollbarColor: 'rgba(52, 152, 219, 0.3) rgba(52, 152, 219, 0.05)'
+              overflow: 'auto'
             }}>
-              <Table stickyHeader aria-label="low vulnerabilities table" sx={{ direction: 'rtl' }}>
+              <Table stickyHeader aria-label="low vulnerabilities table" sx={tableStickyRtlSx}>
                 <TableHead>
                   <TableRow>
-                    <TableCell align="right" sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>מערכת</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 700, color: '#ffffff', backgroundColor: '#3498DB', borderBottom: 'none', fontSize: '0.95rem', py: 2 }}>תיאור</TableCell>
+                    <TableCell align="right" sx={tableHeadCellSx}>מערכת</TableCell>
+                    <TableCell align="right" sx={tableHeadCellSx}>תיאור</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -233,15 +197,10 @@ function LowVulnerabilitiesPage({ user }) {
                     vulnerabilities.map((vuln, index) => (
                       <TableRow 
                         key={`${vuln.system_id}-${vuln.osvdb_id}-${index}`}
-                        sx={{
-                          backgroundColor: '#ffffff',
-                          '&:hover': { backgroundColor: '#f5f8ff' },
-                          borderBottom: '1px solid #f0f0f0',
-                          transition: 'background-color 0.2s ease'
-                        }}
+                        sx={tableBodyRowSx}
                       >
                         <TableCell component="th" scope="row" align="right">
-                          <Link to={`/system/${vuln.system_id}`} style={{ textDecoration: 'none', color: '#3498DB', fontWeight: 'bold' }}>
+                          <Link to={`/system/${vuln.system_id}`} style={{ textDecoration: 'none', color: '#A855F7', fontWeight: 'bold' }}>
                             {vuln.system_name}
                           </Link>
                         </TableCell>
@@ -264,7 +223,7 @@ function LowVulnerabilitiesPage({ user }) {
                             <IconButton 
                               size="small" 
                               onClick={() => handleOpenDialog(vuln)}
-                              sx={{ color: '#3498DB', mt: -0.5 }}
+                              sx={{ color: '#A855F7', mt: -0.5 }}
                             >
                               <VisibilityIcon fontSize="small" />
                             </IconButton>
