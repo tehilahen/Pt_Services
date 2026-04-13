@@ -19,12 +19,11 @@ import {
   Person as PersonIcon
 } from '@mui/icons-material';
 import {
-  APP_ACCENT_LIGHT,
-  APP_ACCENT_SURFACE,
   APP_BACKGROUND_DEFAULT,
   APP_BACKGROUND_PAPER,
   APP_BORDER_BLUE_SOFT,
   APP_PRIMARY_BLUE,
+  APP_SEVERITY_LOW,
   APP_TEXT_PRIMARY,
   APP_TEXT_SECONDARY,
 } from '../themeTokens';
@@ -137,17 +136,17 @@ function Header({ user, onLogout }) {
                   px: 2.5,
                   py: 0.9,
                   borderRadius: 2,
-                  color: APP_PRIMARY_BLUE,
-                  backgroundColor: APP_ACCENT_SURFACE,
-                  border: `1px solid ${APP_BORDER_BLUE_SOFT}`,
+                  color: APP_SEVERITY_LOW,
+                  backgroundColor: '#ECFDF5',
+                  border: '1px solid #BBF7D0',
                   textTransform: 'none',
                   fontWeight: 700,
                   letterSpacing: '0.3px',
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    backgroundColor: APP_ACCENT_LIGHT,
-                    borderColor: APP_PRIMARY_BLUE,
-                    boxShadow: `0 0 0 1px rgba(168, 85, 247, 0.2)`,
+                    backgroundColor: '#DCFCE7',
+                    borderColor: APP_SEVERITY_LOW,
+                    boxShadow: '0 0 0 1px rgba(22, 163, 74, 0.22)',
                   },
                   '&:active': {
                     transform: 'translateY(0) scale(0.99)'

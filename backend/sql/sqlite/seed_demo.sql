@@ -19,9 +19,20 @@ VALUES (
 INSERT OR IGNORE INTO Systems (SystemID, SystemName, IPAddress, Port, URL, SystemManager, Email, RepoURL, Branch)
 VALUES
     (1, 'אתר דמו פנימי', '192.168.1.10', 443, 'https://demo.internal', 'מנהל דמו', 'sys1@demo.local', 'https://dev.azure.com/demo/demo-project/_git/web-app', 'main'),
-    (2, 'API שירותים', '192.168.1.20', 8080, 'http://api.demo.internal:8080', 'מנהל דמו', 'sys2@demo.local', 'https://dev.azure.com/demo/demo-project/_git/api', 'develop');
+    (2, 'API שירותים', '192.168.1.20', 8080, 'http://api.demo.internal:8080', 'מנהל דמו', 'sys2@demo.local', 'https://dev.azure.com/demo/demo-project/_git/api', 'develop'),
+    (3, 'פורטל תלמידים', '192.168.1.30', 443, 'https://students.demo.internal', 'מנהל דמו', 'sys3@demo.local', 'https://dev.azure.com/demo/demo-project/_git/students-portal', 'main'),
+    (4, 'מערכת ניהול ציונים', '192.168.1.40', 8443, 'https://grades.demo.internal:8443', 'מנהל דמו', 'sys4@demo.local', 'https://dev.azure.com/demo/demo-project/_git/grades-service', 'release'),
+    (5, 'שירות זיהוי משתמשים', '192.168.1.50', 9000, 'http://identity.demo.internal:9000', 'מנהל דמו', 'sys5@demo.local', 'https://dev.azure.com/demo/demo-project/_git/identity', 'develop'),
+    (6, 'מערכת דיווח נוכחות', '192.168.1.60', 443, 'https://attendance.demo.internal', 'מנהל דמו', 'sys6@demo.local', 'https://dev.azure.com/demo/demo-project/_git/attendance', 'main');
 
-INSERT OR IGNORE INTO SystemsUsers (UserID, SystemID) VALUES (1, 1), (1, 2);
+INSERT OR IGNORE INTO SystemsUsers (UserID, SystemID)
+VALUES
+    (1, 1),
+    (1, 2),
+    (1, 3),
+    (1, 4),
+    (1, 5),
+    (1, 6);
 
 INSERT OR IGNORE INTO Scans (ScansID, SystemID, ScanDate, start_date, End_date, Status, Duration, Confidance, ScanSource)
 VALUES
