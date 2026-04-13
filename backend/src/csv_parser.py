@@ -146,10 +146,11 @@ class CVSSCSVParser:
             else:
                 # מציאת scan_id מהמערכת
                 scan_result = self.db.execute_query("""
-                    SELECT TOP 1 ScansID 
+                    SELECT ScansID 
                     FROM Scans 
                     WHERE SystemID = ? 
                     ORDER BY ScansID DESC
+                    LIMIT 1
                 """, (system_id,))
                 
                 if not scan_result:
@@ -446,10 +447,11 @@ class CVSSCSVParser:
             else:
                 # מציאת scan_id מהמערכת - נשתמש ב-scan_id האחרון שנמצא או ניצור חדש
                 scan_result = self.db.execute_query("""
-                    SELECT TOP 1 ScansID 
+                    SELECT ScansID 
                     FROM Scans 
                     WHERE SystemID = ? 
                     ORDER BY ScansID DESC
+                    LIMIT 1
                 """, (system_id,))
                 
                 if not scan_result:

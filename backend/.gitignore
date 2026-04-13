@@ -67,6 +67,10 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# דמו מקומי
+data/*.sqlite
+data/*.sqlite-journal
+
 # Flask stuff:
 instance/
 .webassets-cache

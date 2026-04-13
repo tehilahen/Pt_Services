@@ -6,9 +6,8 @@
 
 ### דרישות מערכת
 - Python 3.8+
-- SQL Server (SQLDEV)
-- ODBC Driver 17 for SQL Server
-- שרת SMTP (לשליחת מיילים)
+- **מסד נתונים: SQLite** (קובץ מקומי, נוצר אוטומטית עם סכימה ונתוני דמה מ-[`sql/sqlite/`](sql/sqlite/))
+- שרת SMTP (אופציונלי — לאיפוס סיסמה במייל)
 
 ### התקנה והפעלה
 
@@ -17,23 +16,20 @@
 pip install -r requirements.txt
 ```
 
-#### שלב 2: הקמת מסד נתונים (על ידי DBA)
-```sql
--- הרץ את הסקריפטים הבאים בסדר:
--- 1. יצירת כל הטבלאות
-sql/init_tables.sql
+#### שלב 2: מסד SQLite (דמו)
+בהרצה ראשונה השרת יוצר את הקובץ (ברירת מחדל: `data/demo.sqlite`) מ-`sql/sqlite/schema.sql` ו-`sql/sqlite/seed_demo.sql`.
 
--- 2. יצירת משתמש Admin ראשוני (לאחר עדכון הסיסמה המוצפנת)
-sql/seed_admin_user.sql
-```
+**התחברות דמו:** משתמש `admin`, סיסמה `Admin123!` (החלף בסביבה אמיתית).
+
+ניתן לשנות נתיב עם משתנה `SQLITE_DB_PATH` (ראה `.env.example`).
 
 #### שלב 3: הגדרת משתני סביבה
-צור קובץ `.env` בתיקייה הראשית:
+העתק `.env.example` ל-`.env` והתאם. דוגמה מינימלית:
 ```env
 # ============================================
-# חיבור למסד נתונים
+# מסד נתונים מקומי
 # ============================================
-SQL_CONNECTION_STRING=Driver={ODBC Driver 17 for SQL Server};Server=SQLDEV;Database=SA_DTI_Security_NiktoWebServerScanner;UID=ptuser;PWD=YOUR_PASSWORD;TrustServerCertificate=yes;
+SQLITE_DB_PATH=data/demo.sqlite
 
 # ============================================
 # הגדרות Flask
@@ -96,7 +92,7 @@ python main.py
 
 | משתנה | תיאור | ברירת מחדל | חובה? |
 |-------|-------|-------------|-------|
-| `SQL_CONNECTION_STRING` | מחרוזת חיבור ל-SQL Server | - | ✅ |
+| `SQLITE_DB_PATH` | נתיב לקובץ SQLite | `data/demo.sqlite` (יחסי לתיקיית backend) | ❌ |
 | `FLASK_HOST` | כתובת IP להאזנה | `0.0.0.0` | ❌ |
 | `FLASK_PORT` | פורט השרת | `5000` | ❌ |
 | `FLASK_DEBUG` | מצב Debug | `True` | ❌ |
@@ -381,7 +377,7 @@ python -c "from src.email_service import email_service; email_service.test_conne
 - **Flask** - Web framework
 - **Flask-CORS** - Cross-origin requests
 - **PyJWT** - JWT token handling
-- **pyodbc** - SQL Server connection
+- **sqlite3** (ספריית Python) - מסד נתונים מקומי
 - **werkzeug** - Password hashing
 - **python-dotenv** - Environment variables
 - **Jinja2** - Template engine
@@ -403,6 +399,7 @@ python -c "from src.email_service import email_service; email_service.test_conne
 - ✅ סקריפטי SQL נפרדים ליצירת טבלאות
 - ✅ שיפורי CORS לאבטחה
 - ✅ תיעוד מקיף
+- ✅ מעבר ל-SQLite לדמו מקומי (`sql/sqlite/`, `SQLITE_DB_PATH`)
 
 ### גרסה 2.0 (אוקטובר 2025)
 - ✅ מערכת התחברות מלאה

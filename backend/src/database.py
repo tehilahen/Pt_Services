@@ -1,23 +1,21 @@
 """
-ניהול מסד נתונים SQL Server - כל הפונקציות לעבודה עם מסד הנתונים
+ניהול מסד נתונים SQLite - כל הפונקציות לעבודה עם מסד הנתונים
 דף זה אחראי על:
-- חיבור למסד הנתונים SQL Server
+- חיבור לקובץ SQLite מקומי (דמו / מצב בית ספר)
 - ניהול מערכות (Systems) - יצירה, עדכון, שליפה
 - ניהול סריקות (Scans) - יצירה, עדכון סטטוס, שליפה
 - ניהול חולשות (Vulnerabilities) - הוספה, שליפה לפי מערכת/סריקה
 - ניהול משתמשים (Users) - אימות, איפוס סיסמה, ניהול טוקנים
 - סטטיסטיקות ודוחות
 """
-import pyodbc
-import pandas as pd
+import sqlite3
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import logging
 from src.timezone_utils import get_israel_time
-import re
 import threading
-import time
 from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 import string
@@ -29,62 +27,48 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# הפעלת Connection Pooling ב-pyodbc לשיפור ביצועים
-pyodbc.pooling = True
+_SQLITE_DIR = Path(__file__).resolve().parent.parent / "sql" / "sqlite"
+
 
 class SecurityScansDatabase:
     def __init__(self):
-        """
-        אתחול החיבור למסד הנתונים.
-        אימות באמצעות SQL Server Authentication בלבד (שם משתמש וסיסמה).
-        Connection Pooling מופעל לשיפור ביצועים.
-        """
-        # בדוק אם יש connection string ישיר
-        self.connection_string = os.getenv('SQL_CONNECTION_STRING')
-        
-        # אם אין connection string, בנה אותו מהמשתנים הנפרדים
-        if not self.connection_string:
-            self.server = os.getenv('SQL_SERVER', 'localhost')
-            self.database = os.getenv('SQL_DATABASE', 'SecurityScansDB')
-            self.username = os.getenv('SQL_USERNAME', '')
-            self.password = os.getenv('SQL_PASSWORD', '')
-            self.port = os.getenv('SQL_PORT', '1433')
-            
-            # בניית connection string מהמשתנים - SQL Server Authentication בלבד
-            self.connection_string = (
-                f'DRIVER={{ODBC Driver 17 for SQL Server}};'
-                f'SERVER={self.server};'
-                f'DATABASE={self.database};'
-                f'UID={self.username};'
-                f'PWD={self.password};'
-                f'TrustServerCertificate=yes;'
-            )
-        else:
-            # חלץ את שם הדאטאבייס מה-connection string לשימוש פנימי
-            db_match = re.search(r'Database=([^;]+)', self.connection_string, re.IGNORECASE)
-            self.database = db_match.group(1) if db_match else 'SecurityScansDB'
-            self.server = None
-            
+        """אתחול נתיב קובץ SQLite (ברירת מחדל: backend/data/demo.sqlite)."""
+        default_db = Path(__file__).resolve().parent.parent / "data" / "demo.sqlite"
+        self.db_path = os.path.abspath(os.getenv("SQLITE_DB_PATH", str(default_db)))
+        self.database = self.db_path
         self.connection = None
-        self._lock = threading.Lock()  # הוספת lock למניעת concurrency issues
-        
-        # מנגנון Cache לשיפור ביצועים
+        self._lock = threading.Lock()
         self._cache = {}
-        self._cache_ttl = 60  # זמן תפוגה בשניות (60 שניות)
-        
+        self._cache_ttl = 60
+
     def connect(self):
-        """חיבור למסד הנתונים באמצעות SQL Server Authentication (שם משתמש וסיסמה)"""
+        """חיבור ל-SQLite ויצירת סכימה/נתוני דמה בפעם הראשונה."""
         try:
-            logger.info(f"מתחבר למסד הנתונים {self.database} באמצעות SQL Server Authentication...")
-            
-            # חיבור למסד הנתונים עם connection string
-            self.connection = pyodbc.connect(self.connection_string)
-            logger.info(f"התחברות למסד הנתונים {self.database} הצליחה")
-            
+            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+            self.connection = sqlite3.connect(self.db_path, check_same_thread=False)
+            self.connection.execute("PRAGMA foreign_keys = ON")
+            self._ensure_sqlite_schema()
+            logger.info("התחברות ל-SQLite הצליחה: %s", self.db_path)
             return True
         except Exception as e:
-            logger.error(f"שגיאה בהתחברות למסד הנתונים: {str(e)}")
+            logger.error("שגיאה בהתחברות ל-SQLite: %s", str(e))
             return False
+
+    def _ensure_sqlite_schema(self):
+        cur = self.connection.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='Users'"
+        )
+        if not cur.fetchone():
+            schema_path = _SQLITE_DIR / "schema.sql"
+            seed_path = _SQLITE_DIR / "seed_demo.sql"
+            logger.info("מאתחל מסד SQLite מ-%s", schema_path)
+            with open(schema_path, encoding="utf-8") as f:
+                self.connection.executescript(f.read())
+            if seed_path.is_file():
+                with open(seed_path, encoding="utf-8") as f:
+                    self.connection.executescript(f.read())
+            self.connection.commit()
+        self.create_tables()
 
     # ===============================
     # מנגנון Cache לשיפור ביצועים
@@ -118,43 +102,23 @@ class SecurityScansDatabase:
         logger.debug(f"Cache cleared: {key if key else 'all'}")
 
     def ensure_database_exists(self):
-        """וידוא שמסד הנתונים והטבלאות קיימים"""
-        try:
-            cursor = self.connection.cursor()
-            
-            # בדיקה שהדאטאבייס קיים - שימוש ב-parameterized query למניעת SQL Injection
-            cursor.execute("SELECT name FROM sys.databases WHERE name = ?", (self.database,))
-            if not cursor.fetchone():
-                logger.info(f"יוצר מסד נתונים {self.database}")
-                # DDL לא תומך בפרמטרים - נוודא ששם ה-DB מכיל רק תווים בטוחים
-                safe_db_name = re.sub(r'[^\w]', '', self.database)
-                if safe_db_name != self.database:
-                    raise ValueError(f"שם מסד נתונים לא חוקי: {self.database}")
-                cursor.execute(f"CREATE DATABASE [{safe_db_name}]")
-                self.connection.commit()
-            
-            cursor.close()
-            
-            # יצירת הטבלאות
-            self.create_tables()
-            
-        except Exception as e:
-            logger.error(f"שגיאה ביצירת מסד הנתונים: {str(e)}")
+        """תאימות לאחור — אתחול מתבצע ב-connect דרך _ensure_sqlite_schema."""
+        if self.connection:
+            self._ensure_sqlite_schema()
 
     def create_tables(self):
-        """יצירת הטבלאות בהתבסס על המבנה הקיים"""
+        """מיגרציות קלות לעמודות ישנות (SQLite)."""
         try:
-            # מבטל יצירת טבלאות - רק נבדוק מה יש
-            logger.info("מדלג על יצירת טבלאות - עובד עם מסד נתונים קיים")
-            
-            # וידוא שעמודת Status קיימת בטבלת Vulnerabilities
             self.ensure_vulnerability_status_column()
-            
-            # וידוא שעמודת ScanSource קיימת בטבלת Scans
             self.ensure_scan_source_column()
-            
         except Exception as e:
-            logger.error(f"שגיאה ביצירת טבלאות: {str(e)}")
+            logger.error("שגיאה ב-create_tables: %s", str(e))
+
+    def _sqlite_columns(self, table):
+        rows = self.execute_query(f"PRAGMA table_info({table})")
+        if not rows:
+            return set()
+        return {r.get("name") for r in rows}
 
     def execute_query(self, query, params=None):
         """ביצוע שאילתה עם החזרת תוצאות"""
@@ -236,11 +200,6 @@ class SecurityScansDatabase:
                     logger.error(f"Parameters: {params}")
                 if error_args:
                     logger.error(f"Error args: {error_args}")
-                # Try to get SQL error details if it's a pyodbc error
-                if hasattr(e, 'sqlstate'):
-                    logger.error(f"SQL State: {e.sqlstate}")
-                if hasattr(e, 'errno'):
-                    logger.error(f"Error Number: {e.errno}")
                 return False
             finally:
                 # וידוא סגירת הcursor
@@ -263,7 +222,7 @@ class SecurityScansDatabase:
                     WITH LatestScans AS (
                         SELECT SystemID, MAX(ScansID) as LatestScanID
                         FROM Scans 
-                        WHERE Status = N'הצליח'
+                        WHERE Status = 'הצליח'
                         GROUP BY SystemID
                     ),
                     VulnCounts AS (
@@ -303,7 +262,7 @@ class SecurityScansDatabase:
                     WITH LatestScans AS (
                         SELECT SystemID, MAX(ScansID) as LatestScanID
                         FROM Scans 
-                        WHERE Status = N'הצליח'
+                        WHERE Status = 'הצליח'
                         GROUP BY SystemID
                     ),
                     VulnCounts AS (
@@ -377,10 +336,7 @@ class SecurityScansDatabase:
             system_info = system_data[0]
             if system_info.get('last_scan_date') and isinstance(system_info['last_scan_date'], datetime):
                 system_info['last_scan_date'] = system_info['last_scan_date'].isoformat()
-                
-            return system_info
-            
-            # שליפת סריקות
+
             scans = self.execute_query("""
                 SELECT 
                     sc.ScansID as id,
@@ -434,7 +390,7 @@ class SecurityScansDatabase:
                 
                 # קבלת ה-ID של המערכת החדשה
                 new_system = self.execute_query(
-                    "SELECT TOP 1 SystemID FROM Systems WHERE IPAddress = ? AND Port = ? ORDER BY SystemID DESC",
+                    "SELECT SystemID FROM Systems WHERE IPAddress = ? AND Port = ? ORDER BY SystemID DESC LIMIT 1",
                     (ip_address, port)
                 )
                 
@@ -458,7 +414,7 @@ class SecurityScansDatabase:
             
             # קבלת ה-ID של הסריקה החדשה
             scan_result = self.execute_query(
-                "SELECT TOP 1 ScansID FROM Scans WHERE SystemID = ? ORDER BY ScansID DESC",
+                "SELECT ScansID FROM Scans WHERE SystemID = ? ORDER BY ScansID DESC LIMIT 1",
                 (system_id,)
             )
             
@@ -489,7 +445,7 @@ class SecurityScansDatabase:
                         ELSE 'Security Issue'
                     END as vulnerability_type,
                     COALESCE(v.[References], v.Description, 'בדוק את התיאור החולשה') as recommendations,
-                    COALESCE(v.Status, N'בטיפול') as status,
+                    COALESCE(v.Status, 'בטיפול') as status,
                     sc.ScanDate as scan_date,
                     sc.ScansID as scan_id
                 FROM Vulnerabilities v
@@ -514,10 +470,11 @@ class SecurityScansDatabase:
         try:
             results = self.execute_query("""
                 WITH LatestScan AS (
-                    SELECT TOP 1 ScansID, ScanDate
+                    SELECT ScansID, ScanDate
                     FROM Scans
-                    WHERE SystemID = ? AND Status = N'הצליח'
+                    WHERE SystemID = ? AND Status = 'הצליח'
                     ORDER BY ScansID DESC
+                    LIMIT 1
                 )
                 SELECT 
                     v.VulnerabilityID as id,
@@ -538,7 +495,7 @@ class SecurityScansDatabase:
                     COALESCE(v.[References], v.Description, 'בדוק את התיאור החולשה') as recommendations,
                     ls.ScanDate as scan_date,
                     ls.ScansID as scan_id,
-                    COALESCE(v.Status, N'בטיפול') as status
+                    COALESCE(v.Status, 'בטיפול') as status
                 FROM Vulnerabilities v
                 JOIN LatestScan ls ON v.ScanID = ls.ScansID
                 ORDER BY v.VulnerabilityID DESC
@@ -592,15 +549,15 @@ class SecurityScansDatabase:
                     WITH LatestScans AS (
                         SELECT SystemID, MAX(ScansID) as LatestScanID
                         FROM Scans
-                        WHERE Status = N'הצליח'
+                        WHERE Status = 'הצליח'
                         GROUP BY SystemID
                     )
                     SELECT 
-                        COALESCE(v.Status, N'בטיפול') as status,
+                        COALESCE(v.Status, 'בטיפול') as status,
                         COUNT(*) as count
                     FROM Vulnerabilities v
                     JOIN LatestScans ls ON v.ScanID = ls.LatestScanID
-                    GROUP BY COALESCE(v.Status, N'בטיפול')
+                    GROUP BY COALESCE(v.Status, 'בטיפול')
                 """)
             elif user_id:
                 # משתמש רגיל - רק חולשות של מערכות שהוא מורשה אליהן מסריקה אחרונה
@@ -610,30 +567,30 @@ class SecurityScansDatabase:
                         FROM Systems sys
                         JOIN SystemsUsers su ON sys.SystemID = su.SystemID
                         JOIN Scans s ON sys.SystemID = s.SystemID
-                        WHERE su.UserID = ? AND s.Status = N'הצליח'
+                        WHERE su.UserID = ? AND s.Status = 'הצליח'
                         GROUP BY sys.SystemID
                     )
                     SELECT 
-                        COALESCE(v.Status, N'בטיפול') as status,
+                        COALESCE(v.Status, 'בטיפול') as status,
                         COUNT(*) as count
                     FROM Vulnerabilities v
                     JOIN LatestScans ls ON v.ScanID = ls.LatestScanID
-                    GROUP BY COALESCE(v.Status, N'בטיפול')
+                    GROUP BY COALESCE(v.Status, 'בטיפול')
                 """, (user_id,))
             else:
                 results = self.execute_query("""
                     WITH LatestScans AS (
                         SELECT SystemID, MAX(ScansID) as LatestScanID
                         FROM Scans
-                        WHERE Status = N'הצליח'
+                        WHERE Status = 'הצליח'
                         GROUP BY SystemID
                     )
                     SELECT 
-                        COALESCE(v.Status, N'בטיפול') as status,
+                        COALESCE(v.Status, 'בטיפול') as status,
                         COUNT(*) as count
                     FROM Vulnerabilities v
                     JOIN LatestScans ls ON v.ScanID = ls.LatestScanID
-                    GROUP BY COALESCE(v.Status, N'בטיפול')
+                    GROUP BY COALESCE(v.Status, 'בטיפול')
                 """)
             
             # המרה למילון - כולל כל 4 הסטטוסים
@@ -655,53 +612,33 @@ class SecurityScansDatabase:
     def ensure_vulnerability_status_column(self):
         """וידוא שעמודת Status קיימת בטבלת Vulnerabilities"""
         try:
-            # בדיקה אם העמודה קיימת
-            result = self.execute_query("""
-                SELECT COUNT(*) as count 
-                FROM INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_NAME = 'Vulnerabilities' AND COLUMN_NAME = 'Status'
-            """)
-            
-            if result and result[0].get('count', 0) == 0:
-                # העמודה לא קיימת - נוסיף אותה
+            cols = self._sqlite_columns("Vulnerabilities")
+            if not cols:
+                return False
+            if "Status" not in cols:
                 logger.info("מוסיף עמודת Status לטבלת Vulnerabilities...")
-                self.execute_non_query("""
-                    ALTER TABLE Vulnerabilities 
-                    ADD Status NVARCHAR(20) DEFAULT N'בטיפול'
-                """)
-                logger.info("עמודת Status נוספה בהצלחה")
-                return True
-            else:
-                logger.debug("עמודת Status כבר קיימת")
-                return True
+                self.execute_non_query(
+                    "ALTER TABLE Vulnerabilities ADD COLUMN Status TEXT DEFAULT 'בטיפול'"
+                )
+            return True
         except Exception as e:
-            logger.error(f"שגיאה בוידוא עמודת Status: {str(e)}")
+            logger.error("שגיאה בוידוא עמודת Status: %s", str(e))
             return False
-    
+
     def ensure_scan_source_column(self):
         """וידוא שעמודת ScanSource קיימת בטבלת Scans"""
         try:
-            # בדיקה אם העמודה קיימת
-            result = self.execute_query("""
-                SELECT COUNT(*) as count 
-                FROM INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_NAME = 'Scans' AND COLUMN_NAME = 'ScanSource'
-            """)
-            
-            if result and result[0].get('count', 0) == 0:
-                # העמודה לא קיימת - נוסיף אותה
+            cols = self._sqlite_columns("Scans")
+            if not cols:
+                return False
+            if "ScanSource" not in cols:
                 logger.info("מוסיף עמודת ScanSource לטבלת Scans...")
-                self.execute_non_query("""
-                    ALTER TABLE Scans 
-                    ADD ScanSource NVARCHAR(20) DEFAULT N'Nikto'
-                """)
-                logger.info("עמודת ScanSource נוספה בהצלחה")
-                return True
-            else:
-                logger.debug("עמודת ScanSource כבר קיימת")
-                return True
+                self.execute_non_query(
+                    "ALTER TABLE Scans ADD COLUMN ScanSource TEXT DEFAULT 'Nikto'"
+                )
+            return True
         except Exception as e:
-            logger.error(f"שגיאה בוידוא עמודת ScanSource: {str(e)}")
+            logger.error("שגיאה בוידוא עמודת ScanSource: %s", str(e))
             return False
 
     def _test_connection_internal(self):
@@ -773,60 +710,34 @@ class SecurityScansDatabase:
             return None
 
     def ensure_users_table_exists(self):
-        """
-        וידוא שטבלת Users קיימת.
-        
-        הערה: יצירת טבלאות צריכה להתבצע על ידי DBA באמצעות סקריפטי SQL:
-        - sql/init_tables.sql - יצירת כל הטבלאות
-        - sql/seed_admin_user.sql - יצירת משתמש Admin ראשוני
-        
-        פונקציה זו רק מוודאת שהטבלה קיימת ומוסיפה עמודות חסרות לתאימות.
-        """
+        """וידוא שטבלת Users קיימת והרחבות עמודות ישנות (SQLite)."""
         try:
-            # בדיקה אם הטבלה קיימת
-            table_check = self.execute_query("SELECT name FROM sys.tables WHERE name = 'Users'")
-            
-            if not table_check:
-                logger.error("טבלת Users לא קיימת! יש להריץ את sql/init_tables.sql על ידי DBA")
-                logger.error("לאחר מכן, הרץ את sql/seed_admin_user.sql ליצירת משתמש Admin ראשוני")
+            existing_columns = self._sqlite_columns("Users")
+            if not existing_columns:
+                logger.error("טבלת Users לא קיימת — הרץ sql/sqlite/schema.sql")
                 return
-            
-            logger.debug("טבלת Users קיימת")
-            
-            # בדיקת עמודות קיימות - רק הוספת עמודות חסרות לתאימות
-            existing_columns_data = self.execute_query("""
-                SELECT COLUMN_NAME 
-                FROM INFORMATION_SCHEMA.COLUMNS 
-                WHERE TABLE_NAME = 'Users' AND TABLE_SCHEMA = 'dbo'
-            """)
-            
-            existing_columns = {col['COLUMN_NAME'] for col in existing_columns_data} if existing_columns_data else set()
-
-            # עמודות שעלולות להיות חסרות בגרסאות ישנות
             required_columns = {
-                'Password': "ALTER TABLE Users ADD Password NVARCHAR(255) NULL",
-                'Email': "ALTER TABLE Users ADD Email NVARCHAR(100) NULL",
-                'FullName': "ALTER TABLE Users ADD FullName NVARCHAR(100) NULL",
-                'UserTypeID': "ALTER TABLE Users ADD UserTypeID INT NOT NULL DEFAULT 1",
-                'IsActive': "ALTER TABLE Users ADD IsActive BIT NOT NULL DEFAULT 1",
-                'CreatedDate': "ALTER TABLE Users ADD CreatedDate DATETIME NOT NULL DEFAULT GETDATE()",
-                'LastLoginDate': "ALTER TABLE Users ADD LastLoginDate DATETIME NULL"
+                "Password": "ALTER TABLE Users ADD COLUMN Password TEXT",
+                "Email": "ALTER TABLE Users ADD COLUMN Email TEXT",
+                "FullName": "ALTER TABLE Users ADD COLUMN FullName TEXT",
+                "UserTypeID": "ALTER TABLE Users ADD COLUMN UserTypeID INTEGER NOT NULL DEFAULT 1",
+                "IsActive": "ALTER TABLE Users ADD COLUMN IsActive INTEGER NOT NULL DEFAULT 1",
+                "CreatedDate": "ALTER TABLE Users ADD COLUMN CreatedDate TEXT DEFAULT (datetime('now','localtime'))",
+                "LastLoginDate": "ALTER TABLE Users ADD COLUMN LastLoginDate TEXT",
             }
-
             for col, alter_statement in required_columns.items():
                 if col not in existing_columns:
-                    logger.info(f"מוסיף עמודה חסרה לתאימות: {col}")
+                    logger.info("מוסיף עמודה חסרה לתאימות: %s", col)
                     self.execute_non_query(alter_statement)
-            
         except Exception as e:
-            logger.error(f"שגיאה בבדיקת טבלת Users: {str(e)}")
+            logger.error("שגיאה בבדיקת טבלת Users: %s", str(e))
 
     def update_last_login(self, user_id):
         """עדכון זמן התחברות אחרון"""
         try:
             self.execute_non_query("""
                 UPDATE Users 
-                SET LastLoginDate = GETDATE() 
+                SET LastLoginDate = datetime('now','localtime') 
                 WHERE UserID = ?
             """, (user_id,))
         except Exception as e:
@@ -906,8 +817,13 @@ class SecurityScansDatabase:
                 logger.warning(f"טוקן איפוס כבר נוצל: {reset_token}")
                 return None
             
-            # בדיקה אם הטוקן פג תוקף
-            if datetime.now() > token['ExpiryDate']:
+            exp = token["ExpiryDate"]
+            if isinstance(exp, str):
+                try:
+                    exp = datetime.fromisoformat(exp.replace("Z", "+00:00"))
+                except ValueError:
+                    exp = datetime.strptime(exp[:19], "%Y-%m-%d %H:%M:%S")
+            if datetime.now() > exp:
                 logger.warning(f"טוקן איפוס פג תוקף: {reset_token}")
                 return None
             
@@ -942,7 +858,7 @@ class SecurityScansDatabase:
             # סימון הטוקן כמנוצל
             self.execute_non_query("""
                 UPDATE PasswordResets 
-                SET IsUsed = 1, UsedDate = GETDATE()
+                SET IsUsed = 1, UsedDate = datetime('now','localtime')
                 WHERE ResetToken = ?
             """, (reset_token,))
             
@@ -956,34 +872,34 @@ class SecurityScansDatabase:
     def ensure_password_reset_table_exists(self):
         """וידוא שטבלת איפוס סיסמאות קיימת"""
         try:
-            # בדיקה אם הטבלה קיימת
-            table_check = self.execute_query("SELECT name FROM sys.tables WHERE name = 'PasswordResets'")
-            
+            table_check = self.execute_query(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='PasswordResets'"
+            )
             if not table_check:
                 logger.info("יוצר טבלת PasswordResets...")
                 self.execute_non_query("""
                     CREATE TABLE PasswordResets (
-                        ResetID INT IDENTITY(1,1) PRIMARY KEY,
-                        UserID INT NOT NULL,
-                        ResetToken NVARCHAR(64) NOT NULL UNIQUE,
-                        ExpiryDate DATETIME NOT NULL,
-                        IsUsed BIT DEFAULT 0,
-                        CreatedDate DATETIME DEFAULT GETDATE(),
-                        UsedDate DATETIME NULL,
-                        FOREIGN KEY (UserID) REFERENCES Users(UserID)
+                        ResetID INTEGER PRIMARY KEY AUTOINCREMENT,
+                        UserID INTEGER NOT NULL REFERENCES Users(UserID),
+                        ResetToken TEXT NOT NULL UNIQUE,
+                        ExpiryDate TEXT NOT NULL,
+                        IsUsed INTEGER NOT NULL DEFAULT 0,
+                        CreatedDate TEXT DEFAULT (datetime('now','localtime')),
+                        UsedDate TEXT
                     )
                 """)
-                logger.info("טבלת PasswordResets נוצרה בהצלחה")
-            
+                self.execute_non_query(
+                    "CREATE INDEX IF NOT EXISTS IX_PasswordResets_Token ON PasswordResets(ResetToken)"
+                )
         except Exception as e:
-            logger.error(f"שגיאה ביצירת טבלת PasswordResets: {str(e)}")
+            logger.error("שגיאה ביצירת טבלת PasswordResets: %s", str(e))
 
     def cleanup_expired_reset_tokens(self):
         """ניקוי טוקנים שפג תוקפם"""
         try:
             self.execute_non_query("""
                 DELETE FROM PasswordResets 
-                WHERE ExpiryDate < GETDATE()
+                WHERE datetime(ExpiryDate) < datetime('now','localtime')
             """)
             logger.info("טוקני איפוס שפג תוקפם נמחקו")
         except Exception as e:
@@ -994,7 +910,7 @@ class SecurityScansDatabase:
         """שליפת URL של מערכת לפי SystemID"""
         try:
             result = self.execute_query("""
-                SELECT URL, SystemName, IPaddress, Port
+                SELECT URL, SystemName, IPAddress, Port
                 FROM Systems 
                 WHERE SystemID = ?
             """, (system_id,))
@@ -1057,10 +973,11 @@ class SecurityScansDatabase:
             
             # קבלת ה-ID של הסריקה החדשה
             scan_result = self.execute_query("""
-                SELECT TOP 1 ScansID 
+                SELECT ScansID 
                 FROM Scans 
                 WHERE SystemID = ? 
                 ORDER BY ScansID DESC
+                LIMIT 1
             """, (system_id,))
             
             logger.info(f"Query for new scan ID returned: {scan_result}")
@@ -1073,10 +990,11 @@ class SecurityScansDatabase:
                 logger.error("No scan record found after INSERT - possible commit issue or constraint violation")
                 # Try to see what's in the database
                 all_scans = self.execute_query("""
-                    SELECT TOP 5 ScansID, SystemID, Status, ScanDate
+                    SELECT ScansID, SystemID, Status, ScanDate
                     FROM Scans 
                     WHERE SystemID = ?
                     ORDER BY ScansID DESC
+                    LIMIT 5
                 """, (system_id,))
                 logger.error(f"Recent scans for SystemID {system_id}: {all_scans}")
                 return None
@@ -1171,7 +1089,7 @@ class SecurityScansDatabase:
                         sc.ScanDate as created_at,
                         sc.Status as scan_status,
                         sc.Duration as scan_duration_seconds,
-                        COALESCE(sc.ScanSource, N'Nikto') as scan_source,
+                        COALESCE(sc.ScanSource, 'Nikto') as scan_source,
                         COUNT(v.VulnerabilityID) as total_vulnerabilities,
                         SUM(CASE WHEN v.Severity = 'Critical' THEN 1 ELSE 0 END) as critical_count,
                         SUM(CASE WHEN v.Severity = 'High' THEN 1 ELSE 0 END) as high_count,
@@ -1196,7 +1114,7 @@ class SecurityScansDatabase:
                         sc.ScanDate as created_at,
                         sc.Status as scan_status,
                         sc.Duration as scan_duration_seconds,
-                        COALESCE(sc.ScanSource, N'Nikto') as scan_source,
+                        COALESCE(sc.ScanSource, 'Nikto') as scan_source,
                         COUNT(v.VulnerabilityID) as total_vulnerabilities,
                         SUM(CASE WHEN v.Severity = 'Critical' THEN 1 ELSE 0 END) as critical_count,
                         SUM(CASE WHEN v.Severity = 'High' THEN 1 ELSE 0 END) as high_count,
@@ -1243,7 +1161,7 @@ class SecurityScansDatabase:
                         FROM Systems sys
                         INNER JOIN SystemsUsers su ON sys.SystemID = su.SystemID
                         JOIN Scans sc ON sys.SystemID = sc.SystemID
-                        WHERE su.UserID = ? AND sc.Status = N'הצליח'
+                        WHERE su.UserID = ? AND sc.Status = 'הצליח'
                         GROUP BY sys.SystemID
                     )
                     SELECT 
@@ -1281,7 +1199,7 @@ class SecurityScansDatabase:
                             MAX(sc.ScansID) as LatestScanID
                         FROM Systems sys
                         JOIN Scans sc ON sys.SystemID = sc.SystemID
-                        WHERE sc.Status = N'הצליח'
+                        WHERE sc.Status = 'הצליח'
                         GROUP BY sys.SystemID
                     )
                     SELECT 
@@ -1343,7 +1261,7 @@ class SecurityScansDatabase:
                         FROM Systems sys
                         INNER JOIN SystemsUsers su ON sys.SystemID = su.SystemID
                         JOIN Scans sc ON sys.SystemID = sc.SystemID
-                        WHERE su.UserID = ? AND sc.Status = N'הצליח'
+                        WHERE su.UserID = ? AND sc.Status = 'הצליח'
                         GROUP BY sys.SystemID
                     ),
                     VulnGroups AS (
@@ -1374,24 +1292,26 @@ class SecurityScansDatabase:
                         vg.cvss,
                         vg.cve,
                         vg.system_count,
-                        STUFF((
-                            SELECT DISTINCT ', ' + s2.SystemName
-                            FROM Vulnerabilities v2
-                            JOIN LatestScans ls2 ON v2.ScanID = ls2.LatestScanID
-                            JOIN Scans sc2 ON v2.ScanID = sc2.ScansID
-                            JOIN Systems s2 ON sc2.SystemID = s2.SystemID
-                            WHERE v2.Description = vg.description
-                            FOR XML PATH('')
-                        ), 1, 2, '') as affected_systems,
-                        STUFF((
-                            SELECT DISTINCT ',' + CAST(s3.SystemID AS VARCHAR)
-                            FROM Vulnerabilities v3
-                            JOIN LatestScans ls3 ON v3.ScanID = ls3.LatestScanID
-                            JOIN Scans sc3 ON v3.ScanID = sc3.ScansID
-                            JOIN Systems s3 ON sc3.SystemID = s3.SystemID
-                            WHERE v3.Description = vg.description
-                            FOR XML PATH('')
-                        ), 1, 1, '') as system_ids
+                        (SELECT group_concat(sn, ', ')
+                         FROM (
+                             SELECT DISTINCT s2.SystemName AS sn
+                             FROM Vulnerabilities v2
+                             JOIN LatestScans ls2 ON v2.ScanID = ls2.LatestScanID
+                             JOIN Scans sc2 ON v2.ScanID = sc2.ScansID
+                             JOIN Systems s2 ON sc2.SystemID = s2.SystemID
+                             WHERE v2.Description = vg.description
+                         ) dx
+                        ) as affected_systems,
+                        (SELECT group_concat(CAST(sid AS TEXT), ',')
+                         FROM (
+                             SELECT DISTINCT s3.SystemID AS sid
+                             FROM Vulnerabilities v3
+                             JOIN LatestScans ls3 ON v3.ScanID = ls3.LatestScanID
+                             JOIN Scans sc3 ON v3.ScanID = sc3.ScansID
+                             JOIN Systems s3 ON sc3.SystemID = s3.SystemID
+                             WHERE v3.Description = vg.description
+                         ) dy
+                        ) as system_ids
                     FROM VulnGroups vg
                     ORDER BY 
                         CASE vg.severity WHEN 'Critical' THEN 1 WHEN 'High' THEN 2 ELSE 3 END,
@@ -1402,7 +1322,7 @@ class SecurityScansDatabase:
                     WITH LatestScans AS (
                         SELECT SystemID, MAX(ScansID) as LatestScanID
                         FROM Scans
-                        WHERE Status = N'הצליח'
+                        WHERE Status = 'הצליח'
                         GROUP BY SystemID
                     ),
                     VulnGroups AS (
@@ -1433,24 +1353,26 @@ class SecurityScansDatabase:
                         vg.cvss,
                         vg.cve,
                         vg.system_count,
-                        STUFF((
-                            SELECT DISTINCT ', ' + s2.SystemName
-                            FROM Vulnerabilities v2
-                            JOIN LatestScans ls2 ON v2.ScanID = ls2.LatestScanID
-                            JOIN Scans sc2 ON v2.ScanID = sc2.ScansID
-                            JOIN Systems s2 ON sc2.SystemID = s2.SystemID
-                            WHERE v2.Description = vg.description
-                            FOR XML PATH('')
-                        ), 1, 2, '') as affected_systems,
-                        STUFF((
-                            SELECT DISTINCT ',' + CAST(s3.SystemID AS VARCHAR)
-                            FROM Vulnerabilities v3
-                            JOIN LatestScans ls3 ON v3.ScanID = ls3.LatestScanID
-                            JOIN Scans sc3 ON v3.ScanID = sc3.ScansID
-                            JOIN Systems s3 ON sc3.SystemID = s3.SystemID
-                            WHERE v3.Description = vg.description
-                            FOR XML PATH('')
-                        ), 1, 1, '') as system_ids
+                        (SELECT group_concat(sn, ', ')
+                         FROM (
+                             SELECT DISTINCT s2.SystemName AS sn
+                             FROM Vulnerabilities v2
+                             JOIN LatestScans ls2 ON v2.ScanID = ls2.LatestScanID
+                             JOIN Scans sc2 ON v2.ScanID = sc2.ScansID
+                             JOIN Systems s2 ON sc2.SystemID = s2.SystemID
+                             WHERE v2.Description = vg.description
+                         ) dx
+                        ) as affected_systems,
+                        (SELECT group_concat(CAST(sid AS TEXT), ',')
+                         FROM (
+                             SELECT DISTINCT s3.SystemID AS sid
+                             FROM Vulnerabilities v3
+                             JOIN LatestScans ls3 ON v3.ScanID = ls3.LatestScanID
+                             JOIN Scans sc3 ON v3.ScanID = sc3.ScansID
+                             JOIN Systems s3 ON sc3.SystemID = s3.SystemID
+                             WHERE v3.Description = vg.description
+                         ) dy
+                        ) as system_ids
                     FROM VulnGroups vg
                     ORDER BY 
                         CASE vg.severity WHEN 'Critical' THEN 1 WHEN 'High' THEN 2 ELSE 3 END,
@@ -1493,7 +1415,7 @@ class SecurityScansDatabase:
                         FROM Systems s
                         INNER JOIN SystemsUsers su ON s.SystemID = su.SystemID
                         JOIN Scans sc ON s.SystemID = sc.SystemID
-                        WHERE su.UserID = ? AND sc.Status = N'הצליח'
+                        WHERE su.UserID = ? AND sc.Status = 'הצליח'
                         GROUP BY s.SystemID
                     )
                     SELECT 
@@ -1532,7 +1454,7 @@ class SecurityScansDatabase:
                     WITH LatestScans AS (
                         SELECT SystemID, MAX(ScansID) as LatestScanID
                         FROM Scans
-                        WHERE Status = N'הצליח'
+                        WHERE Status = 'הצליח'
                         GROUP BY SystemID
                     )
                     SELECT 
@@ -1700,7 +1622,7 @@ class SecurityScansDatabase:
             # יצירת המשתמש
             success = self.execute_non_query("""
                 INSERT INTO Users (UserName, Password, Email, FullName, UserTypeID, IsActive, CreatedDate)
-                VALUES (?, ?, ?, ?, ?, 1, GETDATE())
+                VALUES (?, ?, ?, ?, ?, 1, datetime('now','localtime'))
             """, (username, hashed_password, email, full_name, user_type_id))
             
             if not success:
@@ -1708,7 +1630,7 @@ class SecurityScansDatabase:
             
             # שליפת ה-ID של המשתמש החדש
             new_user = self.execute_query(
-                "SELECT TOP 1 UserID FROM Users WHERE UserName = ? ORDER BY UserID DESC",
+                "SELECT UserID FROM Users WHERE UserName = ? ORDER BY UserID DESC LIMIT 1",
                 (username,)
             )
             
@@ -1984,7 +1906,7 @@ class SecurityScansDatabase:
             if not success:
                 return None
             row = self.execute_query(
-                "SELECT TOP 1 Id FROM ManualPTTracking WHERE SystemID = ? ORDER BY Id DESC",
+                "SELECT Id FROM ManualPTTracking WHERE SystemID = ? ORDER BY Id DESC LIMIT 1",
                 (system_id,)
             )
             if row:
@@ -2049,8 +1971,8 @@ class SecurityScansDatabase:
                 FROM ManualPTTracking m
                 INNER JOIN Systems s ON m.SystemID = s.SystemID
                 WHERE m.NextCheckDate IS NOT NULL
-                  AND m.NextCheckDate >= CAST(GETDATE() AS DATE)
-                  AND m.NextCheckDate <= DATEADD(DAY, 45, CAST(GETDATE() AS DATE))
+                  AND date(m.NextCheckDate) >= date('now','localtime')
+                  AND date(m.NextCheckDate) <= date('now','localtime','+45 days')
                 ORDER BY m.NextCheckDate
             """)
             if results:
@@ -2083,14 +2005,16 @@ class SecurityScansDatabase:
     def create_code_review(self, system_id, repo_url, branch, user_id=None):
         """יצירת רשומת סריקת קוד חדשה בסטטוס Queued"""
         try:
-            result = self.execute_query(
+            ok = self.execute_non_query(
                 """INSERT INTO CodeReviews (SystemID, RepoURL, Branch, Status, InitiatedBy)
-                   OUTPUT INSERTED.TaskID
                    VALUES (?, ?, ?, 'Queued', ?)""",
                 (system_id, repo_url, branch, user_id)
             )
-            if result and len(result) > 0:
-                task_id = result[0].get('TaskID')
+            if not ok:
+                return None
+            row = self.execute_query("SELECT last_insert_rowid() AS TaskID", None)
+            if row and len(row) > 0:
+                task_id = row[0].get("TaskID")
                 logger.info(f"Code review task {task_id} created for system {system_id}")
                 return task_id
             return None
@@ -2103,12 +2027,12 @@ class SecurityScansDatabase:
         try:
             if status == 'Running':
                 return self.execute_non_query(
-                    "UPDATE CodeReviews SET Status = ?, StartedAt = GETDATE() WHERE TaskID = ?",
+                    "UPDATE CodeReviews SET Status = ?, StartedAt = datetime('now','localtime') WHERE TaskID = ?",
                     (status, task_id)
                 )
             elif status in ('Succeeded', 'Failed'):
                 return self.execute_non_query(
-                    "UPDATE CodeReviews SET Status = ?, FinishedAt = GETDATE(), ErrorSummary = ? WHERE TaskID = ?",
+                    "UPDATE CodeReviews SET Status = ?, FinishedAt = datetime('now','localtime'), ErrorSummary = ? WHERE TaskID = ?",
                     (status, error_summary, task_id)
                 )
             else:
@@ -2140,10 +2064,9 @@ class SecurityScansDatabase:
                                CASE WHEN cr.TotalCount > 0 THEN cr.HighCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'High') END as high_count,
                                CASE WHEN cr.TotalCount > 0 THEN cr.MediumCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'Medium') END as medium_count,
                                CASE WHEN cr.TotalCount > 0 THEN cr.LowCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'Low') END as low_count
-                        FROM CodeReviews cr WITH (NOLOCK)
-                        INNER JOIN Systems s WITH (NOLOCK) ON cr.SystemID = s.SystemID
+                        FROM CodeReviews cr                        INNER JOIN Systems s ON cr.SystemID = s.SystemID
                         INNER JOIN SystemsUsers su ON s.SystemID = su.SystemID AND su.UserID = ?
-                        LEFT JOIN Users u WITH (NOLOCK) ON cr.InitiatedBy = u.UserID
+                        LEFT JOIN Users u ON cr.InitiatedBy = u.UserID
                         WHERE cr.SystemID = ?
                         ORDER BY cr.CreatedAt DESC
                     """, (user_id, system_id))
@@ -2161,10 +2084,9 @@ class SecurityScansDatabase:
                                CASE WHEN cr.TotalCount > 0 THEN cr.HighCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'High') END as high_count,
                                CASE WHEN cr.TotalCount > 0 THEN cr.MediumCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'Medium') END as medium_count,
                                CASE WHEN cr.TotalCount > 0 THEN cr.LowCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'Low') END as low_count
-                        FROM CodeReviews cr WITH (NOLOCK)
-                        INNER JOIN Systems s WITH (NOLOCK) ON cr.SystemID = s.SystemID
+                        FROM CodeReviews cr                        INNER JOIN Systems s ON cr.SystemID = s.SystemID
                         INNER JOIN SystemsUsers su ON s.SystemID = su.SystemID AND su.UserID = ?
-                        LEFT JOIN Users u WITH (NOLOCK) ON cr.InitiatedBy = u.UserID
+                        LEFT JOIN Users u ON cr.InitiatedBy = u.UserID
                         ORDER BY cr.CreatedAt DESC
                     """, (user_id,))
             else:
@@ -2183,9 +2105,8 @@ class SecurityScansDatabase:
                                CASE WHEN cr.TotalCount > 0 THEN cr.HighCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'High') END as high_count,
                                CASE WHEN cr.TotalCount > 0 THEN cr.MediumCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'Medium') END as medium_count,
                                CASE WHEN cr.TotalCount > 0 THEN cr.LowCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'Low') END as low_count
-                        FROM CodeReviews cr WITH (NOLOCK)
-                        INNER JOIN Systems s WITH (NOLOCK) ON cr.SystemID = s.SystemID
-                        LEFT JOIN Users u WITH (NOLOCK) ON cr.InitiatedBy = u.UserID
+                        FROM CodeReviews cr                        INNER JOIN Systems s ON cr.SystemID = s.SystemID
+                        LEFT JOIN Users u ON cr.InitiatedBy = u.UserID
                         WHERE cr.SystemID = ?
                         ORDER BY cr.CreatedAt DESC
                     """, (system_id,))
@@ -2203,9 +2124,8 @@ class SecurityScansDatabase:
                                CASE WHEN cr.TotalCount > 0 THEN cr.HighCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'High') END as high_count,
                                CASE WHEN cr.TotalCount > 0 THEN cr.MediumCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'Medium') END as medium_count,
                                CASE WHEN cr.TotalCount > 0 THEN cr.LowCount ELSE (SELECT COUNT(*) FROM CodeReviewFindings WHERE TaskID = cr.TaskID AND Severity = 'Low') END as low_count
-                        FROM CodeReviews cr WITH (NOLOCK)
-                        INNER JOIN Systems s WITH (NOLOCK) ON cr.SystemID = s.SystemID
-                        LEFT JOIN Users u WITH (NOLOCK) ON cr.InitiatedBy = u.UserID
+                        FROM CodeReviews cr                        INNER JOIN Systems s ON cr.SystemID = s.SystemID
+                        LEFT JOIN Users u ON cr.InitiatedBy = u.UserID
                         ORDER BY cr.CreatedAt DESC
                     """)
 
@@ -2231,11 +2151,9 @@ class SecurityScansDatabase:
                        cr.ErrorSummary as error_summary,
                        cr.InitiatedBy as initiated_by,
                        u.FullName as initiated_by_name,
-                       (SELECT COUNT(*) FROM CodeReviews cr2 WITH (NOLOCK)
-                        WHERE cr2.SystemID = cr.SystemID AND cr2.TaskID <= cr.TaskID) as version
-                FROM CodeReviews cr WITH (NOLOCK)
-                INNER JOIN Systems s WITH (NOLOCK) ON cr.SystemID = s.SystemID
-                LEFT JOIN Users u WITH (NOLOCK) ON cr.InitiatedBy = u.UserID
+                       (SELECT COUNT(*) FROM CodeReviews cr2                        WHERE cr2.SystemID = cr.SystemID AND cr2.TaskID <= cr.TaskID) as version
+                FROM CodeReviews cr                INNER JOIN Systems s ON cr.SystemID = s.SystemID
+                LEFT JOIN Users u ON cr.InitiatedBy = u.UserID
                 WHERE cr.TaskID = ?
             """, (task_id,))
             if results and len(results) > 0:

@@ -15,6 +15,17 @@ from src.database import db_connection
 logger = logging.getLogger(__name__)
 
 
+def _default_sqlite_db_path():
+    """Same default as SecurityScansDatabase (backend/data/demo.sqlite)."""
+    return os.path.abspath(
+        os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "data",
+            "demo.sqlite",
+        )
+    )
+
+
 class CodeReviewOrchestrator:
     def __init__(self):
         self._client = None
@@ -25,7 +36,7 @@ class CodeReviewOrchestrator:
             'image_name': os.getenv('CODE_REVIEWER_IMAGE', 'code-reviewer:latest'),
             'tfs_pat': os.getenv('TFS_PAT', ''),
             'tfs_base_url': os.getenv('TFS_BASE_URL', ''),
-            'mssql_conn_str': os.getenv('SQL_CONNECTION_STRING', ''),
+            'sqlite_db_path': os.getenv('SQLITE_DB_PATH', _default_sqlite_db_path()),
             'run_mode': os.getenv('CODE_REVIEW_RUN_MODE', 'docker').lower(),
             'work_dir': os.getenv(
                 'CODE_REVIEW_WORK_DIR',
@@ -94,9 +105,11 @@ class CodeReviewOrchestrator:
         scripts_dir = os.path.join(work_dir, 'scripts')
         python_exe = sys.executable
 
-        logger.info(f"Task {task_id} config: work_dir={work_dir}, "
-                    f"tfs_pat={'SET' if config['tfs_pat'] else 'EMPTY'}, "
-                    f"mssql={'SET' if config['mssql_conn_str'] else 'EMPTY'}")
+        logger.info(
+            f"Task {task_id} config: work_dir={work_dir}, "
+            f"tfs_pat={'SET' if config['tfs_pat'] else 'EMPTY'}, "
+            f"sqlite_db={config['sqlite_db_path']}"
+        )
 
         use_windows_auth = sys.platform == 'win32' and not os.getenv('FORCE_PAT_AUTH')
         env = {
@@ -105,7 +118,7 @@ class CodeReviewOrchestrator:
             'REPO_URL': repo_url,
             'BRANCH': branch,
             'TFS_PAT': '' if use_windows_auth else config['tfs_pat'],
-            'MSSQL_CONNECTION_STRING': config['mssql_conn_str'],
+            'SQLITE_DB_PATH': config['sqlite_db_path'],
             'WORK_DIR': work_dir,
         }
 
@@ -168,19 +181,23 @@ class CodeReviewOrchestrator:
         """Run the code review container (executed in a background thread)."""
         container = None
         try:
+            db_host = os.path.abspath(config["sqlite_db_path"])
             environment = {
                 'TASK_ID': str(task_id),
                 'REPO_URL': repo_url,
                 'BRANCH': branch,
                 'TFS_PAT': config['tfs_pat'],
-                'MSSQL_CONNECTION_STRING': config['mssql_conn_str'],
+                'SQLITE_DB_PATH': db_host,
             }
 
             logger.info(f"Starting container for task {task_id}")
 
+            volumes = {db_host: {'bind': db_host, 'mode': 'rw'}}
+
             container = self.client.containers.run(
                 image=config['image_name'],
                 environment=environment,
+                volumes=volumes,
                 detach=True,
                 auto_remove=False,
                 name=f"code-review-{task_id}",

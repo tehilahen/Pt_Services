@@ -1,6 +1,5 @@
 flask==3.0.0
 Flask_Cors
-pyodbc
 python-dotenv
 pandas
 werkzeug
