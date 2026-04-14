@@ -130,23 +130,22 @@ function Header({ user, onLogout }) {
               <Button
                 component={Link}
                 to="/request-scan"
-                variant="text"
+                variant="contained"
                 size="small"
                 sx={{
                   px: 2.5,
                   py: 0.9,
                   borderRadius: 2,
-                  color: APP_SEVERITY_LOW,
-                  backgroundColor: '#ECFDF5',
-                  border: '1px solid #BBF7D0',
+                  color: '#fff',
+                  backgroundColor: APP_SEVERITY_LOW,
                   textTransform: 'none',
                   fontWeight: 700,
                   letterSpacing: '0.3px',
                   transition: 'all 0.2s ease',
+                  boxShadow: 'none',
                   '&:hover': {
-                    backgroundColor: '#DCFCE7',
-                    borderColor: APP_SEVERITY_LOW,
-                    boxShadow: '0 0 0 1px rgba(22, 163, 74, 0.22)',
+                    backgroundColor: '#15803D',
+                    boxShadow: '0 2px 8px rgba(22, 163, 74, 0.35)',
                   },
                   '&:active': {
                     transform: 'translateY(0) scale(0.99)'

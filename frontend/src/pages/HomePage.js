@@ -369,8 +369,7 @@ function HomePage({ user }) {
                           }}>
                             <ComputerIcon sx={{ 
                               fontSize: 44,
-                              color: APP_PRIMARY_BLUE,
-                              filter: 'none',
+                              color: APP_TEXT_SECONDARY,
                               flexShrink: 0
                             }} />
                             
@@ -477,7 +476,7 @@ function HomePage({ user }) {
               </Box>
             ) : (
               <Box sx={{ textAlign: 'center' }}>
-                <ComputerIcon sx={{ fontSize: 60, color: APP_TEXT_SECONDARY, mb: 2, opacity: 0.7 }} />
+                <ComputerIcon sx={{ fontSize: 60, color: APP_TEXT_SECONDARY, mb: 2 }} />
                 <Typography variant="h6" sx={{ color: APP_TEXT_PRIMARY, fontWeight: 600 }}>
                   אין מערכות זמינות לתצוגה
                 </Typography>
